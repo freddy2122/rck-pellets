@@ -1,0 +1,110 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, pdo, pdo_sqlite, bcmath, json, tokenizer
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Create .env file
+        run: |
+          echo "APP_NAME=${{ secrets.APP_NAME }}" >> .env
+          echo "APP_ENV=production" >> .env
+          echo "APP_DEBUG=false" >> .env
+          echo "APP_URL=${{ secrets.APP_URL }}" >> .env
+          echo "APP_KEY=${{ secrets.APP_KEY }}" >> .env
+          echo "DB_CONNECTION=${{ secrets.DB_CONNECTION }}" >> .env
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+          echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}" >> .env
+          echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> .env
+          echo "ADMIN_NAME=${{ secrets.ADMIN_NAME }}" >> .env
+          echo "ADMIN_PHONE=${{ secrets.ADMIN_PHONE }}" >> .env
+          echo "ADMIN_ADDRESS=${{ secrets.ADMIN_ADDRESS }}" >> .env
+          echo "ADMIN_CITY=${{ secrets.ADMIN_CITY }}" >> .env
+          echo "ADMIN_PROVINCE=${{ secrets.ADMIN_PROVINCE }}" >> .env
+          echo "ADMIN_COUNTRY=${{ secrets.ADMIN_COUNTRY }}" >> .env
+          echo "MAIL_MAILER=${{ secrets.MAIL_MAILER }}" >> .env
+          echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> .env
+          echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> .env
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
+          echo "MAIL_ENCRYPTION=${{ secrets.MAIL_ENCRYPTION }}" >> .env
+          echo "MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}" >> .env
+          echo "MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}" >> .env
+          echo "PUBLIC_CONTACT_EMAIL=${{ secrets.PUBLIC_CONTACT_EMAIL }}" >> .env
+          echo "BANK_IBAN=${{ secrets.BANK_IBAN }}" >> .env
+          echo "BANK_BIC=${{ secrets.BANK_BIC }}" >> .env
+
+      - name: Generate application key if not set
+        run: |
+          if [ -z "${{ secrets.APP_KEY }}" ]; then
+            php artisan key:generate
+          fi
+
+      - name: Optimize Laravel
+        run: |
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+
+      - name: Deploy to Hostinger via SSH
+        uses: easingthemes/ssh-deploy@v4
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: ${{ secrets.REMOTE_TARGET }}
+          ARGS: "-rlgoDzvc -i --delete"
+          SOURCE: "./"
+          EXCLUDE: "/node_modules/,/.git/,/.github/,/vendor/,/storage/logs/,/storage/framework/cache/,/storage/framework/sessions/,/storage/framework/views/,/.env"
+          SCRIPT_BEFORE: |
+            cd ${{ secrets.REMOTE_TARGET }}
+            php artisan down --message="Déploiement en cours..."
+          SCRIPT_AFTER: |
+            cd ${{ secrets.REMOTE_TARGET }}
+            php artisan migrate --force
+            php artisan storage:link
+            php artisan cache:clear
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan up

@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../js/**/*.jsx';
+
+@theme {
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    --color-pine: #2e2a39;
+    --color-pine-dark: #2e2a39;
+    --color-moss: #3d6b4f;
+    --color-cream: #fdfbf7;
+    --color-sand: #e4c891;
+    --color-wood: #9b046f;
+    --color-ink: #2e2a39;
+    --color-paper: #fdfbf7;
+    --color-gold: #e4c891;
+    --color-brand: #9b046f;
+    --color-lime: #edffa7;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: #fdfbf7;
+    color: #2e2a39;
+}
+
+.product-description p + p {
+    margin-top: 1rem;
+}
+
+.product-description strong {
+    color: #2e2a39;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+    margin: 0;
+    appearance: none;
+}
+
+input[type='number'] {
+    appearance: textfield;
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+    body {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
