@@ -38,6 +38,10 @@ rsync -avz -e "ssh -p ${REMOTE_PORT}" --delete \
   --exclude 'storage/framework/sessions' \
   --exclude 'storage/framework/views' \
   --exclude '.env' \
+  --exclude 'env-production*.txt' \
+  --exclude 'database/*.sql' \
+  --exclude 'database/*.sqlite' \
+  --exclude '.DS_Store' \
   ./ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/
 
 # Le docroot expose le contenu de public/ ; il doit suivre le build.
