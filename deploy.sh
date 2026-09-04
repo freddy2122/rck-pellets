@@ -26,6 +26,8 @@ rsync -avz -e "ssh -p ${REMOTE_PORT}" --delete \
   --exclude '.git' \
   --exclude '.github' \
   --exclude 'storage/logs' \
+  --exclude 'storage/app' \
+  --exclude 'public/storage' \
   --exclude 'storage/framework/cache' \
   --exclude 'storage/framework/sessions' \
   --exclude 'storage/framework/views' \
