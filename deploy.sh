@@ -9,7 +9,10 @@ echo "🚀 Déploiement vers Hostinger..."
 REMOTE_HOST="185.166.188.65"
 REMOTE_PORT="65002"
 REMOTE_USER="u220939269"
-REMOTE_PATH="/home/u220939269/public_html"
+# Racine de l'application Laravel (contient artisan)
+REMOTE_PATH="/home/u220939269/rck-pellets"
+# Racine servie par le domaine (contient le public/ de Laravel)
+REMOTE_DOCROOT="/home/u220939269/public_html"
 
 # Build des assets localement
 echo "🔨 Build des assets localement..."
@@ -34,6 +37,13 @@ rsync -avz -e "ssh -p ${REMOTE_PORT}" --delete \
   --exclude '.env' \
   ./ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/
 
+# Le docroot expose le contenu de public/ ; il doit suivre le build.
+# Sans effet si REMOTE_DOCROOT est un lien symbolique vers ${REMOTE_PATH}/public.
+echo "📦 Copie des assets publics vers le docroot..."
+rsync -avz -e "ssh -p ${REMOTE_PORT}" \
+  --exclude 'storage' \
+  public/ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DOCROOT}/
+
 # Exécution des commandes sur le serveur distant
 echo "🔧 Configuration sur le serveur..."
 ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} << EOF
@@ -57,6 +67,10 @@ ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} << EOF
   # Permissions
   chmod -R 755 storage bootstrap/cache
   chmod -R 777 storage/app/public
+
+  # OPcache conserve l'ancien bytecode : le vider sinon le code deploye
+  # reste sans effet jusqu'au prochain redemarrage de PHP-FPM.
+  php -r 'function_exists("opcache_reset") && opcache_reset();' || true
 EOF
 
 echo "✅ Déploiement terminé !"

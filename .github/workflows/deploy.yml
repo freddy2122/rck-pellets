@@ -109,4 +109,5 @@ jobs:
             php artisan view:cache
             chmod -R 755 storage bootstrap/cache
             chmod -R 777 storage/app/public
+            php -r 'function_exists("opcache_reset") && opcache_reset();' || true
             php artisan up
