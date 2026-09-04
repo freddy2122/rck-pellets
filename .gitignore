@@ -13,6 +13,8 @@
 /.vscode
 /.zed
 /auth.json
+/database/*.sql
+/database/*.sqlite
 /node_modules
 /public/build
 /public/fonts-manifest.dev.json
@@ -22,6 +24,7 @@
 /storage/pail
 /vendor
 _ide_helper.php
+env-production*.txt
 Homestead.json
 Homestead.yaml
 Thumbs.db
