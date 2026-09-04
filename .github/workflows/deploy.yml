@@ -109,5 +109,6 @@ jobs:
             /opt/alt/php84/usr/bin/php artisan view:cache
             chmod -R 755 storage bootstrap/cache
             chmod -R 777 storage/app/public
+            rsync -a --exclude storage --exclude index.php /home/u220939269/rck-pellets/public/ /home/u220939269/domains/jardinesgerardolienashop.es/public_html/
             /opt/alt/php84/usr/bin/php -r 'function_exists("opcache_reset") && opcache_reset();' || true
             /opt/alt/php84/usr/bin/php artisan up

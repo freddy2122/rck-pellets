@@ -15,7 +15,7 @@ PHP_BIN="/opt/alt/php84/usr/bin/php"
 # Racine de l'application Laravel (contient artisan)
 REMOTE_PATH="/home/u220939269/rck-pellets"
 # Racine servie par le domaine (contient le public/ de Laravel)
-REMOTE_DOCROOT="/home/u220939269/public_html"
+REMOTE_DOCROOT="/home/u220939269/domains/jardinesgerardolienashop.es/public_html"
 
 # Build des assets localement
 echo "🔨 Build des assets localement..."
@@ -41,10 +41,13 @@ rsync -avz -e "ssh -p ${REMOTE_PORT}" --delete \
   ./ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/
 
 # Le docroot expose le contenu de public/ ; il doit suivre le build.
-# Sans effet si REMOTE_DOCROOT est un lien symbolique vers ${REMOTE_PATH}/public.
+# index.php du docroot est un bootstrap sur mesure ($basePath absolu vers
+# REMOTE_PATH) : l'ecraser avec le public/index.php standard de Laravel
+# mettrait le site hors ligne. Ne jamais le transferer.
 echo "📦 Copie des assets publics vers le docroot..."
 rsync -avz -e "ssh -p ${REMOTE_PORT}" \
   --exclude 'storage' \
+  --exclude 'index.php' \
   public/ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DOCROOT}/
 
 # Exécution des commandes sur le serveur distant
