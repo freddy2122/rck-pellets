@@ -37,9 +37,71 @@ class MerchantCatalog
             ->filter(fn (Product $product) => (bool) $product->primaryImageUrl());
     }
 
+    public static function baseUrl(): string
+    {
+        return rtrim((string) config('app.url'), '/');
+    }
+
     public static function productUrl(Product $product): string
     {
-        return rtrim((string) config('app.url'), '/').'/produtos/'.$product->id;
+        return self::baseUrl().'/produtos/'.$product->id;
+    }
+
+    /**
+     * Google Merchant et schema.org exigent des URL absolues.
+     */
+    public static function absoluteUrl(?string $path): ?string
+    {
+        $path = trim((string) $path);
+
+        if ($path === '') {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        return self::baseUrl().'/'.ltrim($path, '/');
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function imageUrls(Product $product): array
+    {
+        return collect($product->imageUrls())
+            ->map(fn (string $url) => self::absoluteUrl($url))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    public static function primaryImageUrl(Product $product): ?string
+    {
+        return self::imageUrls($product)[0] ?? null;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function additionalImageUrls(Product $product): array
+    {
+        return array_slice(self::imageUrls($product), 1, 10);
+    }
+
+    /**
+     * Google Merchant refuse le HTML dans g:description (5000 caracteres max).
+     */
+    public static function plainText(?string $html, int $limit = 5000): string
+    {
+        $text = preg_replace('#<(br|/p|/div|/li)[^>]*>#i', ' ', (string) $html);
+        $text = html_entity_decode(strip_tags((string) $text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = preg_replace('/\s+/u', ' ', $text);
+        $text = trim((string) $text);
+
+        return mb_substr($text, 0, $limit);
     }
 
     public static function organizationGraph(): array
@@ -76,7 +138,7 @@ class MerchantCatalog
 
     public static function productGraph(Product $product): array
     {
-        $images = $product->imageUrls();
+        $images = self::imageUrls($product);
         $offer = [
             '@type' => 'Offer',
             'url' => self::productUrl($product),
@@ -94,7 +156,7 @@ class MerchantCatalog
         $productNode = [
             '@type' => 'Product',
             'name' => $product->name,
-            'description' => $product->description,
+            'description' => self::plainText($product->description),
             'sku' => $product->skuCode(),
             'brand' => [
                 '@type' => 'Brand',

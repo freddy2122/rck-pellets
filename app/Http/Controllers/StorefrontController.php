@@ -31,11 +31,11 @@ class StorefrontController extends Controller
                 $meta = [
                     'title' => $product->name.' · Jardines leña Shop',
                     'description' => Str::limit(
-                        strip_tags((string) $product->description),
+                        MerchantCatalog::plainText($product->description),
                         160,
                     ),
                     'canonical' => MerchantCatalog::productUrl($product),
-                    'image' => $product->primaryImageUrl(),
+                    'image' => MerchantCatalog::primaryImageUrl($product),
                 ];
             }
         }
