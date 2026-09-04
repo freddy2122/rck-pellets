@@ -92,7 +92,7 @@ jobs:
           TARGET: ${{ secrets.REMOTE_TARGET }}
           ARGS: "-rlgoDzvc -i --delete"
           SOURCE: "./"
-          EXCLUDE: "/node_modules/,/.git/,/.github/,/vendor/,/storage/logs/,/storage/framework/cache/,/storage/framework/sessions/,/storage/framework/views/,/.env"
+          EXCLUDE: "/node_modules/,/.git/,/.github/,/storage/logs/,/storage/framework/cache/,/storage/framework/sessions/,/storage/framework/views/,/.env"
           SCRIPT_BEFORE: |
             cd ${{ secrets.REMOTE_TARGET }}
             php artisan down --message="Déploiement en cours..."
@@ -107,4 +107,6 @@ jobs:
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
+            chmod -R 755 storage bootstrap/cache
+            chmod -R 777 storage/app/public
             php artisan up
