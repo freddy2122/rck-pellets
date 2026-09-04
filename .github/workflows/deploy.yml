@@ -95,19 +95,19 @@ jobs:
           EXCLUDE: "/node_modules/,/.git/,/.github/,/storage/logs/,/storage/framework/cache/,/storage/framework/sessions/,/storage/framework/views/,/storage/app/,/public/storage,/.env"
           SCRIPT_BEFORE: |
             cd ${{ secrets.REMOTE_TARGET }}
-            php artisan down --message="Déploiement en cours..."
+            /opt/alt/php84/usr/bin/php artisan down --message="Déploiement en cours..."
           SCRIPT_AFTER: |
             cd ${{ secrets.REMOTE_TARGET }}
-            php artisan migrate --force
-            php artisan storage:link
-            php artisan cache:clear
-            php artisan config:clear
-            php artisan route:clear
-            php artisan view:clear
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            /opt/alt/php84/usr/bin/php artisan migrate --force
+            /opt/alt/php84/usr/bin/php artisan storage:link
+            /opt/alt/php84/usr/bin/php artisan cache:clear
+            /opt/alt/php84/usr/bin/php artisan config:clear
+            /opt/alt/php84/usr/bin/php artisan route:clear
+            /opt/alt/php84/usr/bin/php artisan view:clear
+            /opt/alt/php84/usr/bin/php artisan config:cache
+            /opt/alt/php84/usr/bin/php artisan route:cache
+            /opt/alt/php84/usr/bin/php artisan view:cache
             chmod -R 755 storage bootstrap/cache
             chmod -R 777 storage/app/public
-            php -r 'function_exists("opcache_reset") && opcache_reset();' || true
-            php artisan up
+            /opt/alt/php84/usr/bin/php -r 'function_exists("opcache_reset") && opcache_reset();' || true
+            /opt/alt/php84/usr/bin/php artisan up

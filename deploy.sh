@@ -9,6 +9,9 @@ echo "🚀 Déploiement vers Hostinger..."
 REMOTE_HOST="185.166.188.65"
 REMOTE_PORT="65002"
 REMOTE_USER="u220939269"
+# Le php du PATH est en 8.3 sur ce serveur, incompatible avec les dependances
+# (>= 8.4.1) : toutes les commandes artisan echouaient silencieusement.
+PHP_BIN="/opt/alt/php84/usr/bin/php"
 # Racine de l'application Laravel (contient artisan)
 REMOTE_PATH="/home/u220939269/rck-pellets"
 # Racine servie par le domaine (contient le public/ de Laravel)
@@ -50,19 +53,19 @@ ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} << EOF
   cd ${REMOTE_PATH}
   
   # Migration de la base de données
-  php artisan migrate --force
+  ${PHP_BIN} artisan migrate --force
   
   # Lien du storage
-  php artisan storage:link
+  ${PHP_BIN} artisan storage:link
   
   # Cache
-  php artisan cache:clear
-  php artisan config:clear
-  php artisan route:clear
-  php artisan view:clear
-  php artisan config:cache
-  php artisan route:cache
-  php artisan view:cache
+  ${PHP_BIN} artisan cache:clear
+  ${PHP_BIN} artisan config:clear
+  ${PHP_BIN} artisan route:clear
+  ${PHP_BIN} artisan view:clear
+  ${PHP_BIN} artisan config:cache
+  ${PHP_BIN} artisan route:cache
+  ${PHP_BIN} artisan view:cache
   
   # Permissions
   chmod -R 755 storage bootstrap/cache
@@ -70,7 +73,7 @@ ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} << EOF
 
   # OPcache conserve l'ancien bytecode : le vider sinon le code deploye
   # reste sans effet jusqu'au prochain redemarrage de PHP-FPM.
-  php -r 'function_exists("opcache_reset") && opcache_reset();' || true
+  ${PHP_BIN} -r 'function_exists("opcache_reset") && opcache_reset();' || true
 EOF
 
 echo "✅ Déploiement terminé !"
