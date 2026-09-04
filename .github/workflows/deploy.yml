@@ -18,8 +18,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
-          extensions: mbstring, xml, pdo, pdo_sqlite, bcmath, json, tokenizer
+          php-version: '8.4'
+          extensions: mbstring, xml, dom, pdo, pdo_mysql, pdo_sqlite, bcmath, json, tokenizer, fileinfo, iconv, curl, zip
           coverage: none
 
       - name: Setup Node.js
