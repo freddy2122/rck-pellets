@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{-- Search Console : ne pas retirer, la propriete serait revalidee. --}}
+    <meta name="google-site-verification" content="WwBCLRx4Ag39QR5_NFKOa-3KWOZNRPNWu9mt7kdCWg4">
     <title>{{ $meta['title'] ?? 'Jardines leña Shop · Pellets y leña de calefacción en España' }}</title>
     <meta name="description" content="{{ $meta['description'] ?? 'Tienda online de pellets Steampower y leña de calefacción en España. IVA incluido, factura con NIF/NIE y entrega en la Península a 2,99 €.' }}">
     @if (!empty($meta['noindex']))
