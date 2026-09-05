@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ContactController;
@@ -33,6 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
 /*
  * Routes publiques
  */
+
+Route::get('/articles', [ArticleController::class, 'index']);
+Route::get('/articles/{slug}', [ArticleController::class, 'show']);
 
 Route::get('/products', [ProductController::class, 'index']);
 
@@ -124,6 +128,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/orders/export', [OrderController::class, 'export']);
     Route::get('/admin/orders/{order}', [OrderController::class, 'showAdmin']);
     Route::patch('/admin/orders/{order}', [OrderController::class, 'updateStatus']);
+    Route::get('/admin/articles', [ArticleController::class, 'adminIndex']);
+    Route::post('/admin/articles', [ArticleController::class, 'store']);
+    Route::put('/admin/articles/{article}', [ArticleController::class, 'update']);
+    Route::delete('/admin/articles/{article}', [ArticleController::class, 'destroy']);
     Route::get('/admin/carts', [CartController::class, 'index']);
     Route::delete('/admin/carts/{cart}', [CartController::class, 'destroy']);
     Route::get('/admin/contact-messages', [ContactController::class, 'index']);

@@ -24,6 +24,10 @@ class PageMeta
             'title' => 'Catálogo de pellets y leña',
             'description' => 'Sacos de 15 kg, medias paletas y paletas completas de pellets Steampower, leña seca y troncos para chimenea. Precios con IVA y envío a toda España.',
         ],
+        'guias' => [
+            'title' => 'Guías de pellets y leña',
+            'description' => 'Consejos prácticos sobre consumo, calidad y almacenamiento de pellets y leña: cuánto necesitas, cómo elegir y cómo conservar el poder calorífico.',
+        ],
         'sobre-nos' => [
             'title' => 'Quiénes somos',
             'description' => 'Jardines Gerardo distribuye pellets y leña de calefacción en España desde Polinyà, Barcelona. Conoce nuestro origen y nuestro compromiso con la biomasa.',

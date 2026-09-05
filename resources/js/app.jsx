@@ -14,6 +14,8 @@ import ScrollToTop from './components/ScrollToTop';
 
 import Home from './pages/Home';
 import Products from './pages/Products';
+import Guides from './pages/Guides';
+import GuideDetail from './pages/GuideDetail';
 import ProductDetail from './pages/ProductDetail';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -80,6 +82,22 @@ function App() {
                         element={
                             <PublicLayout>
                                 <ProductDetail />
+                            </PublicLayout>
+                        }
+                    />
+                    <Route
+                        path="/guias"
+                        element={
+                            <PublicLayout>
+                                <Guides />
+                            </PublicLayout>
+                        }
+                    />
+                    <Route
+                        path="/guias/:slug"
+                        element={
+                            <PublicLayout>
+                                <GuideDetail />
                             </PublicLayout>
                         }
                     />

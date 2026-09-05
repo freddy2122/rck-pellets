@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Article;
 use App\Models\Product;
 use App\Support\MerchantCatalog;
 use App\Support\PageMeta;
@@ -42,7 +43,7 @@ class StorefrontController extends Controller
                 $jsonLd['@graph'][] = self::breadcrumbGraph($product);
 
                 $meta = [
-                    'title' => self::productTitle($product->name),
+                    'title' => self::brandedTitle($product->name),
                     'description' => Str::limit(
                         MerchantCatalog::plainText($product->description),
                         155,
@@ -57,14 +58,66 @@ class StorefrontController extends Controller
             }
         }
 
+        if ($any && preg_match('#^guias/([a-z0-9-]+)$#', $any, $matches)) {
+            $article = Article::query()
+                ->published()
+                ->where('slug', $matches[1])
+                ->first();
+
+            if ($article) {
+                $jsonLd['@graph'][] = $article->structuredData();
+                $jsonLd['@graph'][] = self::articleBreadcrumb($article);
+
+                $meta = [
+                    'title' => self::brandedTitle($article->metaTitle()),
+                    'description' => $article->metaDescription(),
+                    'canonical' => $article->url(),
+                    'image' => $article->imageUrl()
+                        ?? MerchantCatalog::absoluteUrl('/images/logo.png'),
+                    'noindex' => false,
+                ];
+            } else {
+                $meta['noindex'] = true;
+            }
+        }
+
         return view('welcome', compact('jsonLd', 'meta', 'product'));
     }
 
+    private static function articleBreadcrumb(Article $article): array
+    {
+        $url = rtrim((string) config('app.url'), '/');
+
+        return [
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                [
+                    '@type' => 'ListItem',
+                    'position' => 1,
+                    'name' => 'Inicio',
+                    'item' => $url.'/',
+                ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 2,
+                    'name' => 'Guías',
+                    'item' => $url.'/guias',
+                ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 3,
+                    'name' => $article->title,
+                    'item' => $article->url(),
+                ],
+            ],
+        ];
+    }
+
     /**
-     * Le nom du produit prime sur la marque : si les deux ne tiennent pas,
-     * on garde le nom seul plutot que de tronquer la marque en plein mot.
+     * L'intitule prime sur la marque : si les deux ne tiennent pas, on garde
+     * l'intitule seul plutot que de tronquer la marque en plein mot.
      */
-    private static function productTitle(string $name): string
+    private static function brandedTitle(string $name): string
     {
         $full = $name.' | '.PageMeta::SITE_NAME;
 
@@ -155,6 +208,10 @@ class StorefrontController extends Controller
         $xml = view('feeds.sitemap', [
             'urls' => $urls,
             'products' => MerchantCatalog::eligibleProducts(),
+            'articles' => Article::query()
+                ->published()
+                ->orderByDesc('published_at')
+                ->get(),
         ])->render();
 
         return response($xml, 200)->header('Content-Type', 'application/xml');

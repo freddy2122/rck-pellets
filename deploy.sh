@@ -86,6 +86,10 @@ ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} << EOF
 
   # Migration de la base de données
   ${PHP_BIN} artisan migrate --force
+
+  # Guides : updateOrCreate sur le slug, les modifications faites depuis
+  # l'administration sur d'autres articles ne sont pas touchées.
+  ${PHP_BIN} artisan db:seed --class=ArticleSeeder --force
   
   # Lien du storage
   ${PHP_BIN} artisan storage:link

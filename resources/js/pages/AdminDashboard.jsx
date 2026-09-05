@@ -16,6 +16,7 @@ import {
     Search,
     Download,
     ShoppingCart,
+    BookOpen,
 } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
@@ -38,6 +39,21 @@ export default function AdminDashboard() {
     const [loadingDetail, setLoadingDetail] = useState(false);
     const [carts, setCarts] = useState([]);
     const [cartsDelay, setCartsDelay] = useState(60);
+    const [articles, setArticles] = useState([]);
+    const [showArticleForm, setShowArticleForm] = useState(false);
+    const [editingArticleId, setEditingArticleId] = useState(null);
+    const [savingArticle, setSavingArticle] = useState(false);
+    const [articleForm, setArticleForm] = useState({
+        title: '',
+        slug: '',
+        excerpt: '',
+        body: '',
+        image: '',
+        metaTitle: '',
+        metaDescription: '',
+        isPublished: false,
+        publishedAt: '',
+    });
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -125,6 +141,7 @@ export default function AdminDashboard() {
 
         loadDashboard();
         loadCarts();
+        loadArticles();
     }, []);
 
     /*
@@ -1000,6 +1017,130 @@ export default function AdminDashboard() {
             link.click();
             link.remove();
             URL.revokeObjectURL(url);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    /*
+     * --------------------------------------------------------------------------
+     * Guides
+     * --------------------------------------------------------------------------
+     */
+
+    const emptyArticle = {
+        title: '',
+        slug: '',
+        excerpt: '',
+        body: '',
+        image: '',
+        metaTitle: '',
+        metaDescription: '',
+        isPublished: false,
+        publishedAt: '',
+    };
+
+    const loadArticles = async () => {
+        try {
+            const response = await fetch('/api/admin/articles', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                setArticles(await response.json());
+            }
+        } catch {
+            // Section non bloquante.
+        }
+    };
+
+    const editArticle = (article) => {
+        setEditingArticleId(article.id);
+        setArticleForm({
+            title: article.title || '',
+            slug: article.slug || '',
+            excerpt: article.excerpt || '',
+            body: article.body || '',
+            image: article.image || '',
+            metaTitle: article.metaTitle || '',
+            metaDescription: article.metaDescription || '',
+            isPublished: Boolean(article.isPublished),
+            publishedAt: article.publishedAt || '',
+        });
+        setShowArticleForm(true);
+    };
+
+    const closeArticleForm = () => {
+        setShowArticleForm(false);
+        setEditingArticleId(null);
+        setArticleForm(emptyArticle);
+    };
+
+    const saveArticle = async (event) => {
+        event.preventDefault();
+        setSavingArticle(true);
+        setError('');
+
+        const url = editingArticleId
+            ? `/api/admin/articles/${editingArticleId}`
+            : '/api/admin/articles';
+
+        try {
+            const response = await fetch(url, {
+                method: editingArticleId ? 'PUT' : 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...articleForm,
+                    // Le serveur derive le slug du titre s'il est vide.
+                    slug: articleForm.slug || null,
+                    publishedAt: articleForm.publishedAt || null,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                const first = data.errors
+                    ? Object.values(data.errors)[0][0]
+                    : data.message;
+                throw new Error(first || "Impossible d'enregistrer la guía.");
+            }
+
+            await loadArticles();
+            closeArticleForm();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setSavingArticle(false);
+        }
+    };
+
+    const deleteArticle = async (articleId) => {
+        if (!window.confirm('Supprimer définitivement cette guía ?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/admin/articles/${articleId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                setArticles((current) =>
+                    current.filter((article) => article.id !== articleId),
+                );
+            }
         } catch (err) {
             setError(err.message);
         }
@@ -2462,6 +2603,265 @@ export default function AdminDashboard() {
                                 </tbody>
                             </table>
                         </div>
+                    )}
+                </section>
+
+                {/* ---------------------------------------------------------------- */}
+                {/* GUIDES */}
+                {/* ---------------------------------------------------------------- */}
+
+                <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
+                            <BookOpen size={21} />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-gray-900">Guías</h3>
+                            <p className="text-sm text-gray-500">
+                                Articles de fond publiés sur /guias. Ils
+                                attirent les recherches informationnelles.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setEditingArticleId(null);
+                                setArticleForm(emptyArticle);
+                                setShowArticleForm(true);
+                            }}
+                            className="ml-auto inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white"
+                        >
+                            <Plus size={16} />
+                            Nouvelle guía
+                        </button>
+                    </div>
+
+                    {showArticleForm ? (
+                        <form
+                            onSubmit={saveArticle}
+                            className="mt-6 space-y-4 rounded-xl border border-gray-200 p-5"
+                        >
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <label className="block">
+                                    <span className="text-xs font-semibold uppercase text-gray-500">
+                                        Titre
+                                    </span>
+                                    <input
+                                        required
+                                        maxLength={180}
+                                        value={articleForm.title}
+                                        onChange={(e) =>
+                                            setArticleForm((f) => ({
+                                                ...f,
+                                                title: e.target.value,
+                                            }))
+                                        }
+                                        className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    />
+                                </label>
+                                <label className="block">
+                                    <span className="text-xs font-semibold uppercase text-gray-500">
+                                        Slug (vide = généré du titre)
+                                    </span>
+                                    <input
+                                        value={articleForm.slug}
+                                        onChange={(e) =>
+                                            setArticleForm((f) => ({
+                                                ...f,
+                                                slug: e.target.value,
+                                            }))
+                                        }
+                                        placeholder="pellets-o-lena"
+                                        className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    />
+                                </label>
+                            </div>
+
+                            <label className="block">
+                                <span className="text-xs font-semibold uppercase text-gray-500">
+                                    Chapeau ({articleForm.excerpt.length}/300)
+                                </span>
+                                <textarea
+                                    required
+                                    rows={2}
+                                    maxLength={300}
+                                    value={articleForm.excerpt}
+                                    onChange={(e) =>
+                                        setArticleForm((f) => ({
+                                            ...f,
+                                            excerpt: e.target.value,
+                                        }))
+                                    }
+                                    className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                />
+                            </label>
+
+                            <label className="block">
+                                <span className="text-xs font-semibold uppercase text-gray-500">
+                                    Corps (HTML : &lt;h2&gt;, &lt;p&gt;,
+                                    &lt;ul&gt;, &lt;table&gt;)
+                                </span>
+                                <textarea
+                                    required
+                                    rows={12}
+                                    value={articleForm.body}
+                                    onChange={(e) =>
+                                        setArticleForm((f) => ({
+                                            ...f,
+                                            body: e.target.value,
+                                        }))
+                                    }
+                                    className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 font-mono text-xs"
+                                />
+                            </label>
+
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <label className="block">
+                                    <span className="text-xs font-semibold uppercase text-gray-500">
+                                        Image (chemin)
+                                    </span>
+                                    <input
+                                        value={articleForm.image}
+                                        onChange={(e) =>
+                                            setArticleForm((f) => ({
+                                                ...f,
+                                                image: e.target.value,
+                                            }))
+                                        }
+                                        placeholder="/images/pellets.jpg"
+                                        className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    />
+                                </label>
+                                <label className="block">
+                                    <span className="text-xs font-semibold uppercase text-gray-500">
+                                        Date de publication
+                                    </span>
+                                    <input
+                                        type="date"
+                                        value={articleForm.publishedAt}
+                                        onChange={(e) =>
+                                            setArticleForm((f) => ({
+                                                ...f,
+                                                publishedAt: e.target.value,
+                                            }))
+                                        }
+                                        className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    />
+                                </label>
+                            </div>
+
+                            <label className="block">
+                                <span className="text-xs font-semibold uppercase text-gray-500">
+                                    Meta description (
+                                    {articleForm.metaDescription.length}/158
+                                    conseillés — vide = chapeau)
+                                </span>
+                                <textarea
+                                    rows={2}
+                                    maxLength={300}
+                                    value={articleForm.metaDescription}
+                                    onChange={(e) =>
+                                        setArticleForm((f) => ({
+                                            ...f,
+                                            metaDescription: e.target.value,
+                                        }))
+                                    }
+                                    className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                />
+                            </label>
+
+                            <label className="flex items-center gap-2 text-sm">
+                                <input
+                                    type="checkbox"
+                                    checked={articleForm.isPublished}
+                                    onChange={(e) =>
+                                        setArticleForm((f) => ({
+                                            ...f,
+                                            isPublished: e.target.checked,
+                                        }))
+                                    }
+                                    className="h-4 w-4 rounded border-gray-300"
+                                />
+                                Publier cette guía
+                            </label>
+
+                            <div className="flex gap-3">
+                                <button
+                                    type="submit"
+                                    disabled={savingArticle}
+                                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+                                >
+                                    {savingArticle ? (
+                                        <LoaderCircle
+                                            size={16}
+                                            className="animate-spin"
+                                        />
+                                    ) : null}
+                                    Enregistrer
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={closeArticleForm}
+                                    className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700"
+                                >
+                                    Annuler
+                                </button>
+                            </div>
+                        </form>
+                    ) : null}
+
+                    {articles.length === 0 ? (
+                        <p className="mt-6 text-sm text-gray-500">
+                            Aucune guía pour le moment.
+                        </p>
+                    ) : (
+                        <ul className="mt-6 divide-y">
+                            {articles.map((article) => (
+                                <li
+                                    key={article.id}
+                                    className="flex flex-wrap items-center gap-3 py-4"
+                                >
+                                    <div className="min-w-[220px] flex-1">
+                                        <p className="font-medium text-gray-900">
+                                            {article.title}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            /guias/{article.slug} ·{' '}
+                                            {article.readingMinutes} min
+                                            {article.publishedAt
+                                                ? ` · ${article.publishedAt}`
+                                                : ''}
+                                        </p>
+                                    </div>
+                                    <span
+                                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                                            article.isPublished
+                                                ? 'bg-emerald-100 text-emerald-800'
+                                                : 'bg-gray-100 text-gray-600'
+                                        }`}
+                                    >
+                                        {article.isPublished
+                                            ? 'Publiée'
+                                            : 'Brouillon'}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => editArticle(article)}
+                                        className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700"
+                                    >
+                                        Modifier
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => deleteArticle(article.id)}
+                                        className="rounded-lg p-2 text-gray-400 hover:bg-rose-50 hover:text-rose-600"
+                                        aria-label="Supprimer"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
                     )}
                 </section>
 

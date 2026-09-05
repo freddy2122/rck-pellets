@@ -7,6 +7,7 @@ import { useSite } from '../lib/SiteContext';
 const links = [
     { to: '/', label: 'Inicio' },
     { to: '/produtos', label: 'Catálogo' },
+    { to: '/guias', label: 'Guías' },
     { to: '/contactos', label: 'Contacto' },
     { to: '/seguir-pedido', label: 'Seguir pedido' },
     { to: '/sobre-nos', label: 'Sobre nosotros' },

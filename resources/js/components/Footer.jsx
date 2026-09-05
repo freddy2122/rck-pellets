@@ -45,6 +45,9 @@ export default function Footer() {
                         <Link to="/produtos" className="hover:underline">
                             Catálogo
                         </Link>
+                        <Link to="/guias" className="hover:underline">
+                            Guías
+                        </Link>
                         <Link to="/seguir-pedido" className="hover:underline">
                             Seguir mi pedido
                         </Link>

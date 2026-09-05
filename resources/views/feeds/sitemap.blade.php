@@ -6,6 +6,13 @@
         <changefreq>weekly</changefreq>
     </url>
 @endforeach
+@foreach ($articles ?? [] as $article)
+    <url>
+        <loc>{{ $article->url() }}</loc>
+        <lastmod>{{ $article->updated_at?->toAtomString() }}</lastmod>
+        <changefreq>monthly</changefreq>
+    </url>
+@endforeach
 @foreach ($products as $product)
     <url>
         <loc>{{ \App\Support\MerchantCatalog::productUrl($product) }}</loc>
