@@ -26,7 +26,12 @@ return new class extends Migration
 
             // active : panier en cours ; converted : commande passee.
             $table->string('status')->default('active')->index();
-            $table->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
+            // Pas de contrainte de cle etrangere : orders.id est un int(11)
+            // signe en production, issu d'un import SQL et non des migrations,
+            // alors que foreignId() genere un bigint non signe. MySQL refuse
+            // l'association. La colonne reste indexee, ce qui suffit ici :
+            // un panier converti n'apparait jamais dans la liste des abandons.
+            $table->unsignedBigInteger('order_id')->nullable()->index();
 
             $table->timestamp('last_activity_at')->nullable()->index();
             $table->timestamps();
