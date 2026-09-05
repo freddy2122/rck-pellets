@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { SITE } from '../lib/site';
+import { statusClass } from '../lib/orderStatus';
 import {
     ORDER_STATUSES,
     formatDeliveryDate,
@@ -140,7 +141,13 @@ function TrackingResult({ order, step }) {
         <div className="mt-8 overflow-hidden rounded-lg border border-[#ddd]">
             <div className="border-b border-[#eee] px-5 py-4">
                 <p className="text-sm text-[#6d6d6d]">Pedido #{order.id}</p>
-                <h2 className="mt-1 text-xl font-semibold">
+                <h2 className="mt-1 flex items-center gap-2 text-xl font-semibold">
+                    <span
+                        className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusClass(
+                            order.status,
+                            'dot',
+                        )}`}
+                    />
                     {order.statusLabel || 'Pedido recibido'}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[#4d4d4d]">

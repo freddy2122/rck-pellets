@@ -20,6 +20,8 @@ import {
 
 import { useNavigate } from 'react-router-dom';
 
+import { statusClass } from '../lib/orderStatus';
+
 export default function AdminDashboard() {
     const navigate = useNavigate();
 
@@ -2287,6 +2289,20 @@ export default function AdminDashboard() {
                                 suite sur Seguir mi pedido.
                             </p>
                         </div>
+                        <div className="ml-auto flex flex-wrap items-center gap-3 text-xs text-gray-600">
+                            <span className="inline-flex items-center gap-1.5">
+                                <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+                                En cours
+                            </span>
+                            <span className="inline-flex items-center gap-1.5">
+                                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                                Livrée
+                            </span>
+                            <span className="inline-flex items-center gap-1.5">
+                                <span className="h-2.5 w-2.5 rounded-full bg-rose-500" />
+                                Annulée
+                            </span>
+                        </div>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 border-b bg-gray-50 px-6 py-4">
@@ -2397,7 +2413,10 @@ export default function AdminDashboard() {
                                                             event.target.value,
                                                         )
                                                     }
-                                                    className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-800"
+                                                    className={`rounded-lg border px-3 py-2 text-sm font-semibold ${statusClass(
+                                                        order.status,
+                                                        'select',
+                                                    )}`}
                                                 >
                                                     <option value="pending_payment">
                                                         Pago pendiente
@@ -2664,14 +2683,29 @@ export default function AdminDashboard() {
                                 <h3 className="text-xl font-bold text-gray-900">
                                     Commande #{orderDetail.number}
                                 </h3>
-                                <p className="mt-1 text-sm text-gray-500">
-                                    {orderDetail.createdAt
-                                        ? new Date(
-                                              orderDetail.createdAt,
-                                          ).toLocaleString('fr-FR')
-                                        : '—'}{' '}
-                                    · {orderDetail.statusLabel}
-                                </p>
+                                <div className="mt-2 flex flex-wrap items-center gap-2">
+                                    <span
+                                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${statusClass(
+                                            orderDetail.status,
+                                            'badge',
+                                        )}`}
+                                    >
+                                        <span
+                                            className={`h-2 w-2 rounded-full ${statusClass(
+                                                orderDetail.status,
+                                                'dot',
+                                            )}`}
+                                        />
+                                        {orderDetail.statusLabel}
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                        {orderDetail.createdAt
+                                            ? new Date(
+                                                  orderDetail.createdAt,
+                                              ).toLocaleString('fr-FR')
+                                            : '—'}
+                                    </span>
+                                </div>
                             </div>
                             <button
                                 type="button"

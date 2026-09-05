@@ -28,6 +28,23 @@ export default function Privacy() {
                 ejecución del contrato, obligación legal (facturación) y
                 consentimiento.
             </p>
+            <h2 className="text-xl font-bold text-stone-900">
+                Cestas abandonadas
+            </h2>
+            <p>
+                Si añades productos a la cesta y facilitas tu email en el
+                proceso de pago sin llegar a finalizar el pedido, conservamos el
+                contenido de esa cesta junto con tu nombre, email y teléfono.
+                Finalidad: recordarte el pedido pendiente y ofrecerte ayuda para
+                completarlo. Base jurídica: interés legítimo del responsable en
+                recuperar ventas no finalizadas, conforme al artículo 6.1.f del
+                RGPD. Mientras no facilites tu email, la cesta se guarda de
+                forma anónima mediante un identificador técnico que no permite
+                identificarte. Estos datos se conservan un máximo de 90 días y
+                se eliminan automáticamente después. Puedes solicitar su
+                supresión inmediata escribiendo a {site.email}, y oponerte en
+                cualquier momento a este tratamiento.
+            </p>
             <h2 className="text-xl font-bold text-stone-900">Conservación</h2>
             <p>
                 Los datos de facturación se conservan durante los plazos

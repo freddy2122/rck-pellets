@@ -34,6 +34,23 @@ class Cart extends Model
         'last_activity_at' => 'datetime',
     ];
 
+    /**
+     * Duree de conservation annoncee dans la politique de confidentialite.
+     */
+    public const RETENTION_DAYS = 90;
+
+    /**
+     * Supprime les paniers au-dela de la duree de conservation.
+     *
+     * @return int nombre de paniers supprimes
+     */
+    public static function purgeExpired(): int
+    {
+        return static::query()
+            ->where('created_at', '<', now()->subDays(self::RETENTION_DAYS))
+            ->delete();
+    }
+
     public function order()
     {
         return $this->belongsTo(Order::class);

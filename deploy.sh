@@ -21,9 +21,24 @@ REMOTE_DOCROOT="/home/u220939269/domains/jardinesgerardolienashop.es/public_html
 echo "🔨 Build des assets localement..."
 npm run build
 
-# Installation des dépendances PHP localement
-echo "📦 Installation des dépendances PHP localement..."
-composer install --no-dev --optimize-autoloader --no-interaction
+# Dépendances PHP de production, construites à l'écart.
+#
+# Un "composer install --no-dev" dans le projet supprimerait PHPUnit et les
+# autres outils de développement de la machine. On installe donc dans un
+# dossier temporaire, qu'on transfère à la place de vendor/.
+echo "📦 Construction des dépendances PHP de production..."
+VENDOR_BUILD="$(mktemp -d)"
+trap 'rm -rf "${VENDOR_BUILD}"' EXIT
+
+cp composer.json composer.lock "${VENDOR_BUILD}/"
+composer install \
+  --working-dir="${VENDOR_BUILD}" \
+  --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+if [ ! -d "${VENDOR_BUILD}/vendor" ]; then
+  echo "❌ Échec de l'installation des dépendances." >&2
+  exit 1
+fi
 
 # Copie des fichiers via rsync
 echo "📦 Copie des fichiers..."
@@ -42,7 +57,13 @@ rsync -avz -e "ssh -p ${REMOTE_PORT}" --delete \
   --exclude 'database/*.sql' \
   --exclude 'database/*.sqlite' \
   --exclude '.DS_Store' \
+  --exclude 'vendor' \
+  --exclude 'bootstrap/cache' \
   ./ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/
+
+echo "📦 Copie des dépendances PHP..."
+rsync -avz -e "ssh -p ${REMOTE_PORT}" --delete \
+  "${VENDOR_BUILD}/vendor/" ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/vendor/
 
 # Le docroot expose le contenu de public/ ; il doit suivre le build.
 # index.php du docroot est un bootstrap sur mesure ($basePath absolu vers
@@ -59,6 +80,10 @@ echo "🔧 Configuration sur le serveur..."
 ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} << EOF
   cd ${REMOTE_PATH}
   
+  # bootstrap/cache n'est pas transfere : il est regenere ici a partir du
+  # vendor de production, sans les paquets de developpement.
+  ${PHP_BIN} artisan package:discover
+
   # Migration de la base de données
   ${PHP_BIN} artisan migrate --force
   

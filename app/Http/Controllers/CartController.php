@@ -91,6 +91,10 @@ class CartController extends Controller
      */
     public function index(Request $request)
     {
+        // Le cron n'est pas garanti sur un hebergement mutualise : on
+        // applique aussi la retention a chaque consultation du back-office.
+        Cart::purgeExpired();
+
         $carts = Cart::query()
             ->abandoned()
             ->when(
