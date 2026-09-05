@@ -56,6 +56,8 @@ export default function Cart() {
                                         >
                                             {imageUrl(item.image) ? (
                                                 <img
+                                                    loading="lazy"
+                                                    decoding="async"
                                                     src={imageUrl(item.image)}
                                                     alt=""
                                                     className="h-full w-full object-contain"

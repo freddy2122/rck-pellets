@@ -1587,6 +1587,8 @@ export default function AdminDashboard() {
                                                     }`}
                                                 >
                                                     <img
+                                                        loading="lazy"
+                                                        decoding="async"
                                                         src={src}
                                                         alt=""
                                                         className="h-32 w-full object-cover"
@@ -1633,6 +1635,8 @@ export default function AdminDashboard() {
                                                     }`}
                                                 >
                                                     <img
+                                                        loading="lazy"
+                                                        decoding="async"
                                                         src={image.preview}
                                                         alt=""
                                                         className="h-32 w-full object-cover"
@@ -1749,6 +1753,8 @@ export default function AdminDashboard() {
                                         <div className="flex items-center gap-4">
                                             {(product.images?.[0]?.url || product.image) ? (
                                                 <img
+                                                    loading="lazy"
+                                                    decoding="async"
                                                     src={
                                                         product.images?.find((image) => image.is_primary)?.url
                                                         || product.images?.[0]?.url
@@ -1887,6 +1893,8 @@ export default function AdminDashboard() {
                             {qualityImagePreview ? (
                                 <div className="relative">
                                     <img
+                                        loading="lazy"
+                                        decoding="async"
                                         src={
                                             qualityImagePreview
                                         }
@@ -2793,6 +2801,8 @@ export default function AdminDashboard() {
                                     >
                                         {item.image ? (
                                             <img
+                                                loading="lazy"
+                                                decoding="async"
                                                 src={item.image}
                                                 alt=""
                                                 className="h-12 w-12 rounded-lg object-cover"

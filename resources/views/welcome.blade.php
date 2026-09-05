@@ -5,17 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $meta['title'] ?? 'Jardines leña Shop · Pellets y leña de calefacción en España' }}</title>
     <meta name="description" content="{{ $meta['description'] ?? 'Tienda online de pellets Steampower y leña de calefacción en España. IVA incluido, factura con NIF/NIE y entrega en la Península a 2,99 €.' }}">
+    @if (!empty($meta['noindex']))
+        <meta name="robots" content="noindex, nofollow">
+    @else
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    @endif
     @if (!empty($meta['canonical']))
         <link rel="canonical" href="{{ $meta['canonical'] }}">
         <meta property="og:url" content="{{ $meta['canonical'] }}">
     @endif
         <meta property="og:locale" content="es_ES">
+    <meta property="og:site_name" content="Jardines leña Shop">
     <meta property="og:type" content="{{ !empty($product) ? 'product' : 'website' }}">
     <meta property="og:title" content="{{ $meta['title'] ?? 'Jardines leña Shop' }}">
     <meta property="og:description" content="{{ $meta['description'] ?? '' }}">
     @if (!empty($meta['image']))
         <meta property="og:image" content="{{ $meta['image'] }}">
+        <meta name="twitter:image" content="{{ $meta['image'] }}">
     @endif
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $meta['title'] ?? 'Jardines leña Shop' }}">
+    <meta name="twitter:description" content="{{ $meta['description'] ?? '' }}">
     @if (!empty($product))
         <meta property="product:price:amount" content="{{ number_format((float) $product->price, 2, '.', '') }}">
         <meta property="product:price:currency" content="EUR">

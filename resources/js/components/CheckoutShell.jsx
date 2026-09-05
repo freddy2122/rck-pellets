@@ -21,6 +21,8 @@ export default function CheckoutShell({ children, summary, showBag = true }) {
                 <div className="relative mx-auto flex max-w-6xl items-center justify-center">
                     <Link to="/" className="inline-flex items-center">
                         <img
+                            loading="lazy"
+                            decoding="async"
                             src="/images/logo.png"
                             alt={site.name}
                             className="h-10 w-auto"

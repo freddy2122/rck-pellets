@@ -63,6 +63,8 @@ export default function CartNotification() {
                 <div className="h-16 w-16 shrink-0 overflow-hidden bg-white">
                     {imageUrl(lastAdded.image) ? (
                         <img
+                            loading="lazy"
+                            decoding="async"
                             src={imageUrl(lastAdded.image)}
                             alt=""
                             className="h-full w-full object-contain p-1"

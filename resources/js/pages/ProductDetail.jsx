@@ -104,6 +104,8 @@ export default function ProductDetail() {
                                 <img
                                     src={photo}
                                     alt={product.name}
+                                    fetchPriority="high"
+                                    decoding="async"
                                     className="aspect-square w-full object-contain p-4 md:p-8"
                                 />
                             ) : (

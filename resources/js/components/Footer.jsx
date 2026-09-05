@@ -87,6 +87,8 @@ export default function Footer() {
                 <div>
                     <div className="inline-flex rounded-md bg-white px-3 py-3">
                         <img
+                            loading="lazy"
+                            decoding="async"
                             src="/images/logo.png"
                             alt={site.name}
                             className="h-12 w-auto"

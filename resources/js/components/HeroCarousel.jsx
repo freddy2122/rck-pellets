@@ -73,6 +73,9 @@ export default function HeroCarousel() {
                                 key={item.title}
                                 src={item.image}
                                 alt={item.alt}
+                                loading={index === 0 ? 'eager' : 'lazy'}
+                                fetchPriority={index === 0 ? 'high' : 'auto'}
+                                decoding="async"
                                 className={`absolute inset-0 h-full w-full object-contain p-6 transition-opacity duration-500 md:p-10 ${
                                     slideIndex === index
                                         ? 'opacity-100'

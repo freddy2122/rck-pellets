@@ -21,6 +21,8 @@ export default function OrderSummary({
                         <div className="relative h-16 w-16 shrink-0 rounded-md border border-[#ddd] bg-white">
                             {imageUrl(item.image) ? (
                                 <img
+                                    loading="lazy"
+                                    decoding="async"
                                     src={imageUrl(item.image)}
                                     alt=""
                                     className="h-full w-full rounded-md object-contain p-1"

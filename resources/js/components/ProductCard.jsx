@@ -17,6 +17,8 @@ export default function ProductCard({ product }) {
                 <div className="relative aspect-square overflow-hidden">
                     {photo ? (
                         <img
+                            loading="lazy"
+                            decoding="async"
                             src={photo}
                             alt={product.name}
                             className="h-full w-full object-contain p-3 transition duration-500 group-hover:scale-[1.03]"
