@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
@@ -114,12 +115,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('/contact', [ContactController::class, 'store']);
 Route::post('/orders', [OrderController::class, 'store']);
+Route::post('/cart/sync', [CartController::class, 'sync']);
 Route::post('/orders/track', [OrderController::class, 'track']);
 Route::get('/orders/{token}', [OrderController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/orders', [OrderController::class, 'index']);
+    Route::get('/admin/orders/export', [OrderController::class, 'export']);
+    Route::get('/admin/orders/{order}', [OrderController::class, 'showAdmin']);
     Route::patch('/admin/orders/{order}', [OrderController::class, 'updateStatus']);
+    Route::get('/admin/carts', [CartController::class, 'index']);
+    Route::delete('/admin/carts/{cart}', [CartController::class, 'destroy']);
     Route::get('/admin/contact-messages', [ContactController::class, 'index']);
     Route::patch('/admin/contact-messages/{contactMessage}', [ContactController::class, 'update']);
     Route::delete('/admin/contact-messages/{contactMessage}', [ContactController::class, 'destroy']);

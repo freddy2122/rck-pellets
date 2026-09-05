@@ -3,13 +3,41 @@ import {
     useContext,
     useEffect,
     useMemo,
+    useRef,
     useState,
 } from 'react';
 import { productMainImage } from './format';
 
 const STORAGE_KEY = 'rck_cart';
 const NOTE_KEY = 'rck_cart_note';
+const TOKEN_KEY = 'rck_cart_token';
+const SYNC_DEBOUNCE_MS = 1500;
 const CartContext = createContext(null);
+
+/**
+ * Identifiant de panier propre au navigateur. Il ne dit rien du visiteur :
+ * tant qu'aucun email n'est saisi au checkout, le panier reste anonyme.
+ */
+function readToken() {
+    try {
+        let token = localStorage.getItem(TOKEN_KEY);
+
+        if (!token) {
+            token =
+                typeof crypto !== 'undefined' && crypto.randomUUID
+                    ? crypto.randomUUID()
+                    : `${Date.now()}-${Math.random().toString(16).slice(2)}`.padEnd(
+                          36,
+                          '0',
+                      ).slice(0, 36);
+            localStorage.setItem(TOKEN_KEY, token);
+        }
+
+        return token;
+    } catch {
+        return null;
+    }
+}
 
 function readCart() {
     try {
@@ -38,10 +66,59 @@ export function CartProvider({ children }) {
         typeof window === 'undefined' ? '' : readNote(),
     );
     const [lastAdded, setLastAdded] = useState(null);
+    const [token] = useState(() =>
+        typeof window === 'undefined' ? null : readToken(),
+    );
+    // Coordonnees saisies au checkout, pour rattacher un panier abandonne.
+    const contactRef = useRef({});
+    const syncedRef = useRef('');
 
     useEffect(() => {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     }, [items]);
+
+    /**
+     * Envoie l'etat du panier au serveur, avec un delai pour ne pas
+     * declencher une requete a chaque clic sur "+".
+     */
+    useEffect(() => {
+        if (!token) {
+            return undefined;
+        }
+
+        const payload = JSON.stringify(
+            items.map((item) => ({
+                id: item.id,
+                quantity: item.quantity,
+            })),
+        );
+
+        // Rien de nouveau, ou panier vide jamais rempli : on n'envoie rien.
+        if (payload === syncedRef.current || (items.length === 0 && !syncedRef.current)) {
+            return undefined;
+        }
+
+        const timer = setTimeout(() => {
+            fetch('/api/cart/sync', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    token,
+                    items: JSON.parse(payload),
+                    ...contactRef.current,
+                }),
+            })
+                .then(() => {
+                    syncedRef.current = payload;
+                })
+                .catch(() => {});
+        }, SYNC_DEBOUNCE_MS);
+
+        return () => clearTimeout(timer);
+    }, [items, token]);
 
     useEffect(() => {
         localStorage.setItem(NOTE_KEY, note);
@@ -167,10 +244,48 @@ export function CartProvider({ children }) {
             setNote('');
         };
 
+        /**
+         * Rattache des coordonnees au panier. Appele au checkout des que le
+         * client saisit son email, pour permettre une relance.
+         */
+        const identify = (contact) => {
+            const next = {};
+
+            ['email', 'firstName', 'lastName', 'phone'].forEach((key) => {
+                if (contact?.[key]) {
+                    next[key] = contact[key];
+                }
+            });
+
+            if (Object.keys(next).length === 0 || !token) {
+                return;
+            }
+
+            contactRef.current = { ...contactRef.current, ...next };
+
+            fetch('/api/cart/sync', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    token,
+                    items: items.map((item) => ({
+                        id: item.id,
+                        quantity: item.quantity,
+                    })),
+                    ...contactRef.current,
+                }),
+            }).catch(() => {});
+        };
+
         return {
             items,
             count,
             subtotal,
+            token,
+            identify,
             note,
             setNote,
             lastAdded,
@@ -180,7 +295,7 @@ export function CartProvider({ children }) {
             removeItem,
             clearCart,
         };
-    }, [items, note, lastAdded]);
+    }, [items, note, lastAdded, token]);
 
     return (
         <CartContext.Provider value={value}>

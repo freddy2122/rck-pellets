@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmationMail;
+use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
@@ -46,6 +49,7 @@ class OrderController extends Controller
             'subtotal' => ['required', 'numeric'],
             'total' => ['required', 'numeric'],
             'tax' => ['nullable', 'numeric'],
+            'cartToken' => ['nullable', 'string', 'size:36'],
         ]);
 
         $items = collect($validated['items'])
@@ -99,6 +103,17 @@ class OrderController extends Controller
 
         $order->number = (string) (1000 + $order->id);
         $order->save();
+
+        // Le panier correspondant sort de la liste des abandons.
+        if (filled($validated['cartToken'] ?? null)) {
+            Cart::query()
+                ->where('token', $validated['cartToken'])
+                ->update([
+                    'status' => 'converted',
+                    'order_id' => $order->id,
+                    'last_activity_at' => now(),
+                ]);
+        }
 
         try {
             Mail::to($order->email)->send(new OrderConfirmationMail($order));
@@ -159,14 +174,94 @@ class OrderController extends Controller
         return response()->json($order->toStorefrontArray());
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::query()
-            ->latest()
+        $orders = $this->adminQuery($request)
             ->get()
             ->map(fn (Order $order) => $order->toAdminArray());
 
         return response()->json($orders);
+    }
+
+    /**
+     * Fiche complete d'une commande, pour le back-office.
+     */
+    public function showAdmin(Order $order)
+    {
+        return response()->json($order->toAdminDetailArray());
+    }
+
+    /**
+     * Export CSV des commandes, en respectant recherche et filtre courants.
+     */
+    public function export(Request $request): StreamedResponse
+    {
+        $query = $this->adminQuery($request);
+        $filename = 'pedidos-'.now()->format('Y-m-d-His').'.csv';
+
+        return response()->streamDownload(function () use ($query) {
+            $handle = fopen('php://output', 'wb');
+
+            // BOM UTF-8 : sans lui Excel casse les accents et le ñ.
+            fwrite($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($handle, Order::csvHeader(), ';');
+
+            $query->chunk(200, function ($orders) use ($handle) {
+                foreach ($orders as $order) {
+                    fputcsv($handle, $order->toCsvRow(), ';');
+                }
+            });
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    /**
+     * Base commune a la liste et a l'export : recherche libre sur le
+     * numero, l'email et le nom, plus un filtre de statut.
+     */
+    private function adminQuery(Request $request): Builder
+    {
+        $query = Order::query()->latest();
+
+        $search = trim((string) $request->query('q', ''));
+
+        if ($search !== '') {
+            $term = '%'.mb_strtolower($search).'%';
+
+            $query->where(function (Builder $sub) use ($term, $search) {
+                $sub->where('number', 'like', '%'.ltrim($search, '#').'%')
+                    ->orWhereRaw('LOWER(email) like ?', [$term])
+                    ->orWhereRaw('LOWER(first_name) like ?', [$term])
+                    ->orWhereRaw('LOWER(last_name) like ?', [$term]);
+            });
+
+            // "Juan Garcia" : chaque mot doit se retrouver dans le prenom
+            // ou le nom. Evite un CONCAT, dont la syntaxe differe entre
+            // MySQL et SQLite.
+            $words = preg_split('/\s+/u', mb_strtolower($search), -1, PREG_SPLIT_NO_EMPTY);
+
+            if (count($words) > 1) {
+                $query->orWhere(function (Builder $sub) use ($words) {
+                    foreach ($words as $word) {
+                        $sub->where(function (Builder $part) use ($word) {
+                            $part->whereRaw('LOWER(first_name) like ?', ['%'.$word.'%'])
+                                ->orWhereRaw('LOWER(last_name) like ?', ['%'.$word.'%']);
+                        });
+                    }
+                });
+            }
+        }
+
+        $status = (string) $request->query('status', '');
+
+        if ($status !== '' && array_key_exists($status, Order::STATUSES)) {
+            $query->where('status', $status);
+        }
+
+        return $query;
     }
 
     public function updateStatus(Request $request, Order $order)

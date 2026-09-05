@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     Landmark,
     LayoutDashboard,
@@ -13,6 +13,9 @@ import {
     Pencil,
     Image as ImageIcon,
     Star,
+    Search,
+    Download,
+    ShoppingCart,
 } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +28,14 @@ export default function AdminDashboard() {
     const [orders, setOrders] = useState([]);
     const [messages, setMessages] = useState([]);
     const [updatingOrderId, setUpdatingOrderId] = useState(null);
+    // Total non filtre, pour l'indicateur du tableau de bord.
+    const [ordersTotal, setOrdersTotal] = useState(0);
+    const [orderSearch, setOrderSearch] = useState('');
+    const [orderStatusFilter, setOrderStatusFilter] = useState('');
+    const [orderDetail, setOrderDetail] = useState(null);
+    const [loadingDetail, setLoadingDetail] = useState(false);
+    const [carts, setCarts] = useState([]);
+    const [cartsDelay, setCartsDelay] = useState(60);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -111,7 +122,31 @@ export default function AdminDashboard() {
         }
 
         loadDashboard();
+        loadCarts();
     }, []);
+
+    /*
+     * Recherche et filtre : on attend une pause de frappe avant d'interroger
+     * le serveur. Le premier rendu est ignore, loadDashboard s'en charge.
+     */
+    const filtersReady = useRef(false);
+
+    useEffect(() => {
+        if (!token) {
+            return undefined;
+        }
+
+        if (!filtersReady.current) {
+            filtersReady.current = true;
+            return undefined;
+        }
+
+        const timer = setTimeout(() => {
+            loadOrders(orderSearch.trim(), orderStatusFilter);
+        }, 350);
+
+        return () => clearTimeout(timer);
+    }, [orderSearch, orderStatusFilter]);
 
     /*
      * --------------------------------------------------------------------------
@@ -174,9 +209,12 @@ export default function AdminDashboard() {
             });
 
             if (ordersResponse.ok) {
-                setOrders(await ordersResponse.json());
+                const ordersData = await ordersResponse.json();
+                setOrders(ordersData);
+                setOrdersTotal(ordersData.length);
             } else {
                 setOrders([]);
+                setOrdersTotal(0);
             }
 
             const bankResponse = await fetch('/api/site-content/bank');
@@ -873,6 +911,141 @@ export default function AdminDashboard() {
         }
     };
 
+    /**
+     * Recharge la liste des commandes en tenant compte de la recherche
+     * et du filtre de statut.
+     */
+    const loadOrders = async (search, status) => {
+        const params = new URLSearchParams();
+
+        if (search) params.set('q', search);
+        if (status) params.set('status', status);
+
+        try {
+            const response = await fetch(
+                `/api/admin/orders?${params.toString()}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/json',
+                    },
+                },
+            );
+
+            if (response.ok) {
+                setOrders(await response.json());
+            }
+        } catch {
+            // Silencieux : la liste precedente reste affichee.
+        }
+    };
+
+    const openOrderDetail = async (orderId) => {
+        setLoadingDetail(true);
+        setError('');
+
+        try {
+            const response = await fetch(`/api/admin/orders/${orderId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Impossible de charger la commande.');
+            }
+
+            setOrderDetail(await response.json());
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoadingDetail(false);
+        }
+    };
+
+    /**
+     * Telecharge le CSV. On passe par un blob : le lien direct ne peut pas
+     * porter l'en-tete Authorization.
+     */
+    const exportOrders = async () => {
+        const params = new URLSearchParams();
+
+        if (orderSearch) params.set('q', orderSearch);
+        if (orderStatusFilter) params.set('status', orderStatusFilter);
+
+        try {
+            const response = await fetch(
+                `/api/admin/orders/export?${params.toString()}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                },
+            );
+
+            if (!response.ok) {
+                throw new Error("L'export a échoué.");
+            }
+
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.download = `pedidos-${new Date()
+                .toISOString()
+                .slice(0, 10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const loadCarts = async () => {
+        try {
+            const response = await fetch('/api/admin/carts', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCarts(Array.isArray(data.carts) ? data.carts : []);
+                setCartsDelay(data.abandonedAfterMinutes ?? 60);
+            }
+        } catch {
+            // Section non bloquante.
+        }
+    };
+
+    const deleteCart = async (cartId) => {
+        if (!window.confirm('Supprimer définitivement ce panier ?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/admin/carts/${cartId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                setCarts((current) =>
+                    current.filter((cart) => cart.id !== cartId),
+                );
+            }
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
     const saveBankDetails = async (event) => {
         event.preventDefault();
         setSavingBank(true);
@@ -1184,7 +1357,7 @@ export default function AdminDashboard() {
                                 </p>
 
                                 <p className="mt-2 text-3xl font-bold text-gray-900">
-                                    {orders.length}
+                                    {ordersTotal}
                                 </p>
                             </div>
 
@@ -2116,9 +2289,52 @@ export default function AdminDashboard() {
                         </div>
                     </div>
 
+                    <div className="flex flex-wrap items-center gap-3 border-b bg-gray-50 px-6 py-4">
+                        <div className="relative min-w-[220px] flex-1">
+                            <Search
+                                size={16}
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                            />
+                            <input
+                                type="search"
+                                value={orderSearch}
+                                onChange={(event) =>
+                                    setOrderSearch(event.target.value)
+                                }
+                                placeholder="N° de commande, e-mail ou nom"
+                                className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm"
+                            />
+                        </div>
+                        <select
+                            value={orderStatusFilter}
+                            onChange={(event) =>
+                                setOrderStatusFilter(event.target.value)
+                            }
+                            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm"
+                        >
+                            <option value="">Tous les statuts</option>
+                            <option value="pending_payment">Pago pendiente</option>
+                            <option value="paid">Pago confirmado</option>
+                            <option value="preparing">En preparación</option>
+                            <option value="shipped">Enviado</option>
+                            <option value="delivered">Entregado</option>
+                            <option value="cancelled">Cancelado</option>
+                        </select>
+                        <button
+                            type="button"
+                            onClick={exportOrders}
+                            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        >
+                            <Download size={16} />
+                            Exporter CSV
+                        </button>
+                    </div>
+
                     {orders.length === 0 ? (
                         <div className="p-6 text-center text-sm text-gray-500">
-                            Aucune commande pour le moment.
+                            {orderSearch || orderStatusFilter
+                                ? 'Aucune commande ne correspond à cette recherche.'
+                                : 'Aucune commande pour le moment.'}
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
@@ -2136,6 +2352,9 @@ export default function AdminDashboard() {
                                         </th>
                                         <th className="px-6 py-3 font-semibold">
                                             Statut
+                                        </th>
+                                        <th className="px-6 py-3 font-semibold">
+                                            Détail
                                         </th>
                                     </tr>
                                 </thead>
@@ -2199,6 +2418,126 @@ export default function AdminDashboard() {
                                                         Cancelado
                                                     </option>
                                                 </select>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        openOrderDetail(order.id)
+                                                    }
+                                                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                                >
+                                                    Voir
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </section>
+
+                {/* ---------------------------------------------------------------- */}
+                {/* PANIERS ABANDONNÉS */}
+                {/* ---------------------------------------------------------------- */}
+
+                <section className="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm">
+                    <div className="flex items-center gap-3 p-6">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-100 text-rose-700">
+                            <ShoppingCart size={21} />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-gray-900">
+                                Paniers abandonnés
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                                Paniers non convertis, sans activité depuis plus
+                                de {cartsDelay} minutes.
+                            </p>
+                        </div>
+                    </div>
+
+                    {carts.length === 0 ? (
+                        <div className="p-6 pt-0 text-sm text-gray-500">
+                            Aucun panier abandonné pour le moment.
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full text-left text-sm">
+                                <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
+                                    <tr>
+                                        <th className="px-6 py-3 font-semibold">
+                                            Contact
+                                        </th>
+                                        <th className="px-6 py-3 font-semibold">
+                                            Contenu
+                                        </th>
+                                        <th className="px-6 py-3 font-semibold">
+                                            Montant
+                                        </th>
+                                        <th className="px-6 py-3 font-semibold">
+                                            Dernière activité
+                                        </th>
+                                        <th className="px-6 py-3" />
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {carts.map((cart) => (
+                                        <tr
+                                            key={cart.id}
+                                            className="border-b last:border-0"
+                                        >
+                                            <td className="px-6 py-4">
+                                                {cart.contactable ? (
+                                                    <>
+                                                        <p className="font-medium text-gray-900">
+                                                            {cart.name ||
+                                                                'Sans nom'}
+                                                        </p>
+                                                        <a
+                                                            href={`mailto:${cart.email}`}
+                                                            className="text-xs text-emerald-700 underline"
+                                                        >
+                                                            {cart.email}
+                                                        </a>
+                                                    </>
+                                                ) : (
+                                                    <span className="text-xs italic text-gray-400">
+                                                        Visiteur anonyme
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 text-gray-700">
+                                                {cart.items
+                                                    .map(
+                                                        (item) =>
+                                                            `${item.quantity} × ${item.name}`,
+                                                    )
+                                                    .join(', ')}
+                                            </td>
+                                            <td className="px-6 py-4 font-medium text-gray-900">
+                                                {Number(cart.subtotal).toFixed(2)}{' '}
+                                                €
+                                            </td>
+                                            <td className="px-6 py-4 text-xs text-gray-500">
+                                                {cart.lastActivityAt
+                                                    ? new Date(
+                                                          cart.lastActivityAt,
+                                                      ).toLocaleString('fr-FR')
+                                                    : '—'}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        deleteCart(cart.id)
+                                                    }
+                                                    title="Supprimer ce panier"
+                                                    className="rounded-lg p-2 text-gray-400 hover:bg-rose-50 hover:text-rose-600"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -2297,6 +2636,203 @@ export default function AdminDashboard() {
                     )}
                 </section>
             </div>
+
+            {/* ---------------------------------------------------------------- */}
+            {/* FICHE COMMANDE */}
+            {/* ---------------------------------------------------------------- */}
+
+            {loadingDetail ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <LoaderCircle
+                        size={32}
+                        className="animate-spin text-white"
+                    />
+                </div>
+            ) : null}
+
+            {orderDetail ? (
+                <div
+                    className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4"
+                    onClick={() => setOrderDetail(null)}
+                >
+                    <div
+                        className="my-8 w-full max-w-3xl rounded-2xl bg-white shadow-xl"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <header className="flex items-start justify-between border-b p-6">
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-900">
+                                    Commande #{orderDetail.number}
+                                </h3>
+                                <p className="mt-1 text-sm text-gray-500">
+                                    {orderDetail.createdAt
+                                        ? new Date(
+                                              orderDetail.createdAt,
+                                          ).toLocaleString('fr-FR')
+                                        : '—'}{' '}
+                                    · {orderDetail.statusLabel}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setOrderDetail(null)}
+                                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100"
+                                aria-label="Fermer"
+                            >
+                                <X size={20} />
+                            </button>
+                        </header>
+
+                        <div className="grid gap-6 p-6 sm:grid-cols-2">
+                            <div>
+                                <h4 className="text-xs font-semibold uppercase text-gray-500">
+                                    Client
+                                </h4>
+                                <p className="mt-2 font-medium text-gray-900">
+                                    {orderDetail.customer.name}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                    <a
+                                        href={`mailto:${orderDetail.customer.email}`}
+                                        className="text-emerald-700 underline"
+                                    >
+                                        {orderDetail.customer.email}
+                                    </a>
+                                </p>
+                                {orderDetail.customer.phone ? (
+                                    <p className="text-sm text-gray-600">
+                                        <a
+                                            href={`tel:${orderDetail.customer.phone}`}
+                                            className="text-emerald-700 underline"
+                                        >
+                                            {orderDetail.customer.phone}
+                                        </a>
+                                    </p>
+                                ) : null}
+                                {orderDetail.customer.nif ? (
+                                    <p className="mt-1 text-sm text-gray-600">
+                                        NIF : {orderDetail.customer.nif}
+                                    </p>
+                                ) : null}
+                                {orderDetail.customer.company ? (
+                                    <p className="text-sm text-gray-600">
+                                        {orderDetail.customer.company}
+                                    </p>
+                                ) : null}
+                            </div>
+
+                            <div>
+                                <h4 className="text-xs font-semibold uppercase text-gray-500">
+                                    Livraison
+                                </h4>
+                                <p className="mt-2 text-sm leading-6 text-gray-700">
+                                    {orderDetail.address.street}
+                                    {orderDetail.address.address2
+                                        ? `, ${orderDetail.address.address2}`
+                                        : ''}
+                                    <br />
+                                    {orderDetail.address.postalCode}{' '}
+                                    {orderDetail.address.city}
+                                    <br />
+                                    {orderDetail.address.district},{' '}
+                                    {orderDetail.address.country}
+                                </p>
+                                <p className="mt-2 text-xs text-gray-500">
+                                    {orderDetail.shipping.detail}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                    Livraison estimée :{' '}
+                                    {orderDetail.shipping.estimatedDelivery}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="border-t px-6 py-4">
+                            <h4 className="text-xs font-semibold uppercase text-gray-500">
+                                Articles
+                            </h4>
+                            <ul className="mt-3 divide-y">
+                                {orderDetail.items.map((item, index) => (
+                                    <li
+                                        key={`${item.id}-${index}`}
+                                        className="flex items-center gap-3 py-3"
+                                    >
+                                        {item.image ? (
+                                            <img
+                                                src={item.image}
+                                                alt=""
+                                                className="h-12 w-12 rounded-lg object-cover"
+                                            />
+                                        ) : null}
+                                        <div className="flex-1">
+                                            <p className="font-medium text-gray-900">
+                                                {item.name}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                {item.quantity} ×{' '}
+                                                {item.price.toFixed(2)} €
+                                            </p>
+                                        </div>
+                                        <p className="font-medium text-gray-900">
+                                            {item.lineTotal.toFixed(2)} €
+                                        </p>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div className="border-t px-6 py-4 text-sm">
+                            <div className="flex justify-between py-1 text-gray-600">
+                                <span>Sous-total</span>
+                                <span>
+                                    {orderDetail.totals.subtotal.toFixed(2)} €
+                                </span>
+                            </div>
+                            <div className="flex justify-between py-1 text-gray-600">
+                                <span>
+                                    Livraison ({orderDetail.shipping.label})
+                                </span>
+                                <span>
+                                    {orderDetail.totals.shipping.toFixed(2)} €
+                                </span>
+                            </div>
+                            <div className="flex justify-between py-1 text-gray-600">
+                                <span>TVA incluse</span>
+                                <span>
+                                    {orderDetail.totals.tax.toFixed(2)} €
+                                </span>
+                            </div>
+                            <div className="mt-2 flex justify-between border-t pt-3 text-base font-bold text-gray-900">
+                                <span>Total</span>
+                                <span>
+                                    {orderDetail.totals.total.toFixed(2)} €
+                                </span>
+                            </div>
+                            <p className="mt-3 text-xs text-gray-500">
+                                Paiement : {orderDetail.payment.label}
+                            </p>
+                        </div>
+
+                        <footer className="flex flex-wrap items-center justify-between gap-3 border-t bg-gray-50 px-6 py-4">
+                            <a
+                                href={orderDetail.trackingUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-emerald-700 underline"
+                            >
+                                Voir la page de suivi du client
+                            </a>
+                            <button
+                                type="button"
+                                onClick={() => setOrderDetail(null)}
+                                className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white"
+                            >
+                                Fermer
+                            </button>
+                        </footer>
+                    </div>
+                </div>
+            ) : null}
         </main>
     );
 }

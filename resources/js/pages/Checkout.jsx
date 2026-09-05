@@ -74,7 +74,7 @@ function paymentLogos(id) {
 }
 
 export default function Checkout() {
-    const { items, subtotal, clearCart, note } = useCart();
+    const { items, subtotal, clearCart, note, token: cartToken, identify } = useCart();
     const site = useSite();
     const navigate = useNavigate();
     const [form, setForm] = useState(() => {
@@ -182,6 +182,7 @@ export default function Checkout() {
             subtotal: totals.subtotal,
             total: totals.total,
             tax: totals.tax,
+            cartToken,
         };
 
         setLoading(true);
@@ -257,6 +258,13 @@ export default function Checkout() {
                             placeholder="E-mail"
                             className={inputClass}
                             autoComplete="email"
+                            onBlur={() =>
+                                identify({
+                                    email: form.email,
+                                    firstName: form.firstName,
+                                    lastName: form.lastName,
+                                })
+                            }
                         />
                         <span className={labelClass}>E-mail</span>
                     </div>
