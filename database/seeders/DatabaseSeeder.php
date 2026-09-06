@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             CatalogSeeder::class,
             ArticleSeeder::class,
             ProductImageSeeder::class,
+            DeduplicateProductImagesSeeder::class,
         ]);
     }
 }

@@ -94,6 +94,7 @@ ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} << EOF
   # Visuels produits : associe chaque SKU a son image principale, sans
   # supprimer celles deja televersees depuis le back-office.
   ${PHP_BIN} artisan db:seed --class=ProductImageSeeder --force
+  ${PHP_BIN} artisan db:seed --class=DeduplicateProductImagesSeeder --force
   
   # Lien du storage
   #
