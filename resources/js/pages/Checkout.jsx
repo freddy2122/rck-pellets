@@ -4,7 +4,6 @@ import { LoaderCircle, Lock } from 'lucide-react';
 import CheckoutShell from '../components/CheckoutShell';
 import OrderSummary from '../components/OrderSummary';
 import PhoneField from '../components/PhoneField';
-import { Mastercard, Visa } from '../components/PaymentMethods';
 import { useCart } from '../lib/cart';
 import {
     PAYMENT_METHODS,
@@ -51,19 +50,6 @@ const emptyForm = {
     billingSame: true,
     notes: '',
 };
-
-function paymentLogos(id) {
-    if (id === 'cartao') {
-        return (
-            <span className="flex items-center gap-1">
-                <Visa />
-                <Mastercard />
-            </span>
-        );
-    }
-
-    return null;
-}
 
 export default function Checkout() {
     const { items, subtotal, clearCart, note, token: cartToken, identify } = useCart();
@@ -473,7 +459,6 @@ export default function Checkout() {
                                             />
                                             {method.label}
                                         </span>
-                                        {paymentLogos(method.id)}
                                     </label>
                                     {selected && (
                                         <div className="border-t border-[#d0d0d0] bg-[#f5f5f5] px-4 py-4 text-sm leading-6 text-[#4d4d4d]">
