@@ -92,7 +92,12 @@ ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} << EOF
   ${PHP_BIN} artisan db:seed --class=ArticleSeeder --force
   
   # Lien du storage
+  #
+  # storage:link cree le lien dans public/, mais le domaine est servi
+  # depuis un autre dossier. Sans ce second lien, les images televersees
+  # depuis l'administration ne sont pas servies.
   ${PHP_BIN} artisan storage:link
+  ln -sfn ${REMOTE_PATH}/storage/app/public ${REMOTE_DOCROOT}/storage
   
   # Cache
   ${PHP_BIN} artisan cache:clear

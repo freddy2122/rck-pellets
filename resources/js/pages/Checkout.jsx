@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, Lock } from 'lucide-react';
 import CheckoutShell from '../components/CheckoutShell';
 import OrderSummary from '../components/OrderSummary';
 import PhoneField from '../components/PhoneField';
