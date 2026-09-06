@@ -6,11 +6,6 @@ export const CHECKOUT_DRAFT_KEY = 'rck_checkout_draft';
 
 export const PAYMENT_METHODS = [
     {
-        id: 'multibanco',
-        label: 'Multibanco',
-        hint: 'Registramos el pedido y enviamos las instrucciones de pago por e-mail.',
-    },
-    {
         id: 'transferencia',
         label: 'Ingreso bancario',
         hint: 'Tras el pedido verás el IBAN, el BIC y la referencia en la página de confirmación.',

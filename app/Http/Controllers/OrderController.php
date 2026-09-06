@@ -40,7 +40,7 @@ class OrderController extends Controller
             'city' => ['required', 'string', 'max:120'],
             'district' => ['required', 'string', 'max:120'],
             'nif' => ['nullable', 'string', 'max:20'],
-            'payment' => ['required', Rule::in(['multibanco', 'transferencia'])],
+            'payment' => ['required', Rule::in(['transferencia'])],
             'newsletter' => ['sometimes', 'boolean'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.id' => ['required', 'integer'],

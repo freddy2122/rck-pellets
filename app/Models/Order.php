@@ -75,11 +75,15 @@ class Order extends Model
     public function paymentLabel(): string
     {
         return match ($this->payment) {
-            'mbway' => 'MB WAY',
             'transferencia' => 'Ingreso bancario',
-            'cartao' => 'Tarjeta de crédito',
-            'klarna' => 'Klarna',
-            default => 'Multibanco',
+
+            // Commandes anterieures au retrait des moyens de paiement
+            // portugais, absents du marche espagnol. Conserves pour que
+            // l'historique reste lisible dans le back-office.
+            'multibanco' => 'Multibanco (retirado)',
+            'mbway' => 'MB WAY (retirado)',
+
+            default => 'Ingreso bancario',
         };
     }
 

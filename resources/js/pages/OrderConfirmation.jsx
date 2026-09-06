@@ -3,7 +3,6 @@ import { Link, useParams } from 'react-router-dom';
 import { Check, Copy } from 'lucide-react';
 import CheckoutShell from '../components/CheckoutShell';
 import OrderSummary from '../components/OrderSummary';
-import { Multibanco } from '../components/PaymentMethods';
 import { paymentLabel, readLastOrder } from '../lib/checkout';
 import { formatCheckoutMoney, formatIban } from '../lib/format';
 import {
@@ -211,9 +210,6 @@ export default function OrderConfirmation() {
                     </Detail>
                     <Detail title="Método de pago">
                         <span className="inline-flex items-center gap-2">
-                            {order.payment === 'multibanco' ? (
-                                <Multibanco />
-                            ) : null}
                             {paymentLabel(order.payment)} · {amount} EUR
                         </span>
                         <p className="mt-2">

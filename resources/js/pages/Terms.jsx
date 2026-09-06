@@ -26,8 +26,9 @@ export default function Terms() {
             </p>
             <h2 className="text-xl font-bold text-stone-900">2. Pago</h2>
             <p>
-                Transferencia bancaria o referencia Multibanco. No almacenamos
-                datos de tarjeta en esta tienda.
+                Ingreso o transferencia bancaria a la cuenta indicada en la
+                confirmación del pedido. No almacenamos datos de tarjeta en
+                esta tienda.
             </p>
             <h2 className="text-xl font-bold text-stone-900">3. Entrega</h2>
             <p>

@@ -87,22 +87,6 @@ export function Mastercard() {
     );
 }
 
-export function Multibanco() {
-    return (
-        <Badge label="Multibanco" className="border border-stone-300 bg-white">
-            <span className="flex flex-col items-center leading-none">
-                <span className="text-[11px] font-black">
-                    <span className="text-[#003399]">M</span>
-                    <span className="text-stone-800">B</span>
-                </span>
-                <span className="text-[5px] font-bold tracking-widest text-stone-500">
-                    MULTIBANCO
-                </span>
-            </span>
-        </Badge>
-    );
-}
-
 export function Visa() {
     return (
         <Badge label="Visa" className="bg-[#1A1F71]">
@@ -120,7 +104,6 @@ const methods = [
     Klarna,
     Maestro,
     Mastercard,
-    Multibanco,
     Visa,
 ];
 

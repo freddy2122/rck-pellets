@@ -4,11 +4,7 @@ import { LoaderCircle, Lock } from 'lucide-react';
 import CheckoutShell from '../components/CheckoutShell';
 import OrderSummary from '../components/OrderSummary';
 import PhoneField from '../components/PhoneField';
-import {
-    Mastercard,
-    Multibanco,
-    Visa,
-} from '../components/PaymentMethods';
+import { Mastercard, Visa } from '../components/PaymentMethods';
 import { useCart } from '../lib/cart';
 import {
     PAYMENT_METHODS,
@@ -51,7 +47,7 @@ const emptyForm = {
     phoneCountry: 'ES',
     nif: '',
     showNif: false,
-    payment: 'multibanco',
+    payment: 'transferencia',
     billingSame: true,
     notes: '',
 };
@@ -64,10 +60,6 @@ function paymentLogos(id) {
                 <Mastercard />
             </span>
         );
-    }
-
-    if (id === 'multibanco') {
-        return <Multibanco />;
     }
 
     return null;
@@ -92,7 +84,8 @@ export default function Checkout() {
 
         merged.phoneCountry = findPhoneCountry(merged.phoneCountry).iso;
 
-        if (merged.payment === 'mbway') {
+        // Brouillons enregistres avant le retrait des moyens portugais.
+        if (['mbway', 'multibanco'].includes(merged.payment)) {
             merged.payment = 'transferencia';
         }
 
