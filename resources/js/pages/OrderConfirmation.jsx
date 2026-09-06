@@ -153,11 +153,14 @@ export default function OrderConfirmation() {
 
                     <div className="mt-4 rounded-lg bg-[#ffffff] px-4 py-4">
                         <h3 className="text-sm font-semibold">
-                            Instrucciones de transferencia
+                            {order.payment === 'cajero'
+                                ? 'Instrucciones de ingreso'
+                                : 'Instrucciones de transferencia'}
                         </h3>
                         <p className="mt-1 text-xs leading-5 text-[#6d6d6d]">
-                            Usa el número de pedido como concepto para
-                            identificar el pago.
+                            {order.payment === 'cajero'
+                                ? 'Ingresa el importe en un cajero automático o en la ventanilla de tu banco. Usa el número de pedido como concepto.'
+                                : 'Usa el número de pedido como concepto para identificar el pago.'}
                         </p>
                         <div className="mt-3 grid gap-3">
                             <CopyRow

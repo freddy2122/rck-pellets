@@ -7,8 +7,13 @@ export const CHECKOUT_DRAFT_KEY = 'rck_checkout_draft';
 export const PAYMENT_METHODS = [
     {
         id: 'transferencia',
-        label: 'Ingreso bancario',
+        label: 'Transferencia bancaria',
         hint: 'Tras el pedido verás el IBAN, el BIC y la referencia en la página de confirmación.',
+    },
+    {
+        id: 'cajero',
+        label: 'Ingreso en cajero automático',
+        hint: 'Ingresa el importe en un cajero automático o en la ventanilla de tu banco, indicando el número de pedido como concepto. Verás el IBAN y la referencia en la confirmación.',
     },
 ];
 

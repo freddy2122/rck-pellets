@@ -75,7 +75,8 @@ class Order extends Model
     public function paymentLabel(): string
     {
         return match ($this->payment) {
-            'transferencia' => 'Ingreso bancario',
+            'transferencia' => 'Transferencia bancaria',
+            'cajero' => 'Ingreso en cajero automático',
 
             // Commandes anterieures au retrait des moyens de paiement
             // portugais, absents du marche espagnol. Conserves pour que
@@ -83,7 +84,7 @@ class Order extends Model
             'multibanco' => 'Multibanco (retirado)',
             'mbway' => 'MB WAY (retirado)',
 
-            default => 'Ingreso bancario',
+            default => 'Transferencia bancaria',
         };
     }
 

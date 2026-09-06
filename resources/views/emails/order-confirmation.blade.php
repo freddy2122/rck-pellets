@@ -53,8 +53,16 @@
                     </tr>
                     <tr>
                         <td style="font-size:15px;line-height:1.6;color:#4d4d4d;padding-bottom:22px;">
-                            Realiza el pago por transferencia SEPA antes del
-                            <strong>{{ $payBy }}</strong>, utilizando los datos siguientes.
+                            @if ($order->payment === 'cajero')
+                                Ingresa el importe en un cajero automático o en la
+                                ventanilla de tu banco antes del
+                                <strong>{{ $payBy }}</strong>, utilizando los datos
+                                siguientes.
+                            @else
+                                Realiza el pago por transferencia SEPA antes del
+                                <strong>{{ $payBy }}</strong>, utilizando los datos
+                                siguientes.
+                            @endif
                             Concepto: <strong>{{ $order->number }}</strong>.
                         </td>
                     </tr>
