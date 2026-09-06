@@ -7,22 +7,22 @@ const slides = [
         title: 'Pellets de madera premium para una calefacción eficiente',
         cta: 'Comprar ahora',
         to: '/produtos?cat=pellets',
-        image: '/images/pellets.jpg',
-        alt: 'Saco de pellets Steampower 15 kg',
+        image: '/images/pellets-saco-15kg.jpg',
+        alt: 'Saco de pellets Steampower de 15 kg',
     },
     {
         title: 'Leña seca para chimenea, estufa y horno',
         cta: 'Comprar leña',
         to: '/produtos?cat=lenha',
-        image: '/images/lenha.jpg',
-        alt: 'Leña de calefacción apilada',
+        image: '/images/lena-paleta-seca.jpg',
+        alt: 'Paleta de leña seca para calefacción',
     },
     {
         title: 'Palets de pellets y madera para todo el invierno',
         cta: 'Ver catálogo',
         to: '/produtos',
-        image: '/images/pellets2.jpg',
-        alt: 'Palet de pellets Steampower',
+        image: '/images/pellets-paleta-975kg.jpg',
+        alt: 'Paleta de pellets Steampower de 975 kg',
     },
 ];
 
@@ -73,8 +73,8 @@ export default function HeroCarousel() {
                                 key={item.title}
                                 src={item.image}
                                 alt={item.alt}
-                                loading={index === 0 ? 'eager' : 'lazy'}
-                                fetchPriority={index === 0 ? 'high' : 'auto'}
+                                loading={slideIndex === 0 ? 'eager' : 'lazy'}
+                                fetchPriority={slideIndex === 0 ? 'high' : 'auto'}
                                 decoding="async"
                                 className={`absolute inset-0 h-full w-full object-contain p-6 transition-opacity duration-500 md:p-10 ${
                                     slideIndex === index
