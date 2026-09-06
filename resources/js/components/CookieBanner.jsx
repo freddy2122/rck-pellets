@@ -1,20 +1,9 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const STORAGE_KEY = 'rck_cookie_consent';
+import { setConsent, useCookieBannerVisible } from '../lib/consent';
 
 export default function CookieBanner() {
-    const [visible, setVisible] = useState(false);
-
-    useEffect(() => {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        setVisible(!stored);
-    }, []);
-
-    const choose = (value) => {
-        localStorage.setItem(STORAGE_KEY, value);
-        setVisible(false);
-    };
+    const visible = useCookieBannerVisible();
 
     if (!visible) {
         return null;
@@ -42,14 +31,14 @@ export default function CookieBanner() {
                 <div className="flex shrink-0 flex-wrap gap-2">
                     <button
                         type="button"
-                        onClick={() => choose('essential')}
+                        onClick={() => setConsent('essential')}
                         className="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700"
                     >
                         Solo esenciales
                     </button>
                     <button
                         type="button"
-                        onClick={() => choose('all')}
+                        onClick={() => setConsent('all')}
                         className="rounded-full bg-pine px-4 py-2 text-sm font-semibold text-white"
                     >
                         Aceptar todas

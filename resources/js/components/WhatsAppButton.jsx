@@ -1,15 +1,23 @@
 import { whatsappLink } from '../lib/site';
 import { useSite } from '../lib/SiteContext';
+import { useCookieBannerVisible } from '../lib/consent';
 
 export default function WhatsAppButton() {
     const site = useSite();
+    const bannerVisible = useCookieBannerVisible();
+
+    // Le bandeau cookies occupe le bas de l'ecran : on remonte le bouton
+    // tant qu'il est affiche, pour ne pas masquer ses boutons.
+    const offset = bannerVisible
+        ? 'bottom-64 lg:bottom-32'
+        : 'bottom-28 lg:bottom-6';
 
     return (
         <a
             href={whatsappLink(undefined, site.whatsapp)}
             target="_blank"
             rel="noreferrer"
-            className="fixed bottom-28 right-4 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white lg:bottom-6 lg:h-14 lg:w-14"
+            className={`fixed right-4 z-[60] ${offset} flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition-all hover:scale-105`}
             aria-label={`WhatsApp ${site.whatsappDisplay}`}
         >
             <svg viewBox="0 0 32 32" className="h-7 w-7" fill="currentColor">
