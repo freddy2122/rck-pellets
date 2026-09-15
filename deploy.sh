@@ -91,6 +91,9 @@ ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} << EOF
   # l'administration sur d'autres articles ne sont pas touchées.
   ${PHP_BIN} artisan db:seed --class=ArticleSeeder --force
 
+  # Catalogue : firstOrCreate/updateOrCreate sur le sku, sans risque a rejouer.
+  ${PHP_BIN} artisan db:seed --class=CatalogSeeder --force
+
   # Visuels produits : associe chaque SKU a son image principale, sans
   # supprimer celles deja televersees depuis le back-office.
   ${PHP_BIN} artisan db:seed --class=ProductImageSeeder --force
