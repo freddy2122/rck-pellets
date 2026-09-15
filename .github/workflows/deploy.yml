@@ -101,6 +101,7 @@ jobs:
             /opt/alt/php84/usr/bin/php artisan package:discover
             /opt/alt/php84/usr/bin/php artisan migrate --force
             /opt/alt/php84/usr/bin/php artisan db:seed --class=ArticleSeeder --force
+            /opt/alt/php84/usr/bin/php artisan db:seed --class=CatalogSeeder --force
             /opt/alt/php84/usr/bin/php artisan db:seed --class=ProductImageSeeder --force
             /opt/alt/php84/usr/bin/php artisan db:seed --class=DeduplicateProductImagesSeeder --force
             /opt/alt/php84/usr/bin/php artisan storage:link
