@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useSite } from '../lib/SiteContext';
 import Newsletter from './Newsletter';
-import PaymentMethods from './PaymentMethods';
 
 export default function Footer() {
     const site = useSite();
@@ -106,8 +105,6 @@ export default function Footer() {
                     </p>
                 </div>
             </div>
-
-            <PaymentMethods />
 
             <div className="border-t border-ink/10">
                 <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-5 text-xs text-ink/55 sm:px-6 md:flex-row md:justify-between">
