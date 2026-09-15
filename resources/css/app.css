@@ -36,6 +36,23 @@ body {
     color: #2e2a39;
 }
 
+.product-description h3 {
+    display: flex;
+    align-items: center;
+    margin-top: 2rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2e2a39;
+}
+
+.product-description h3:first-child {
+    margin-top: 0;
+}
+
+.product-description h3 + p {
+    margin-top: 0.75rem;
+}
+
 input[type='number']::-webkit-outer-spin-button,
 input[type='number']::-webkit-inner-spin-button {
     margin: 0;

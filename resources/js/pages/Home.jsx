@@ -100,7 +100,7 @@ export default function Home() {
         },
         {
             q: '¿Cuál es el plazo de entrega?',
-            a: 'Las entregas en la Península se realizan en un plazo estimado de 2 a 5 días laborables, según la ubicación y el stock. Los gastos de envío son de 2,99 €. Baleares, Canarias, Ceuta y Melilla: 5 a 10 días laborables, portes 24,90 €.',
+            a: 'Las entregas en la Península se realizan en un plazo estimado de 2 a 5 días laborables, según la ubicación y el stock. Los gastos de envío son de 1,50 €. Baleares, Canarias, Ceuta y Melilla: 5 a 10 días laborables, portes 24,90 €.',
         },
         {
             q: '¿Qué tipos de leña y carbón vendéis?',

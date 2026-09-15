@@ -22,7 +22,7 @@ export const SITE = {
         mainland: '2 a 5 días laborables (Península)',
         islands: '5 a 10 días laborables (Baleares, Canarias, Ceuta y Melilla)',
         freeFrom: 250,
-        mainlandPrice: 2.99,
+        mainlandPrice: 1.5,
         islandsPrice: 24.9,
     },
     bank: {
