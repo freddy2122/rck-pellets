@@ -68,6 +68,13 @@ export default function AdminDashboard() {
     const [updatingOrderId, setUpdatingOrderId] = useState(null);
     // Total non filtre, pour l'indicateur du tableau de bord.
     const [ordersTotal, setOrdersTotal] = useState(0);
+    const [funnel, setFunnel] = useState({
+        cartsTotal: 0,
+        cartsAbandoned: 0,
+        ordersPending: 0,
+        ordersPaid: 0,
+        ordersCancelled: 0,
+    });
     const [orderSearch, setOrderSearch] = useState('');
     const [orderStatusFilter, setOrderStatusFilter] = useState('');
     const [orderDetail, setOrderDetail] = useState(null);
@@ -270,6 +277,17 @@ export default function AdminDashboard() {
             } else {
                 setOrders([]);
                 setOrdersTotal(0);
+            }
+
+            const funnelResponse = await fetch('/api/admin/orders/funnel', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                },
+            });
+
+            if (funnelResponse.ok) {
+                setFunnel(await funnelResponse.json());
             }
 
             const bankResponse = await fetch('/api/site-content/bank');
@@ -1577,6 +1595,77 @@ export default function AdminDashboard() {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+                    <h3 className="font-bold text-gray-900">
+                        Entonnoir de vente
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                        Du panier à la vente confirmée.
+                    </p>
+
+                    <div className="mt-6 grid gap-4 sm:grid-cols-4">
+                        {[
+                            {
+                                label: 'Paniers créés',
+                                value: funnel.cartsTotal,
+                                color: 'text-gray-900',
+                            },
+                            {
+                                label: 'Paniers abandonnés',
+                                value: funnel.cartsAbandoned,
+                                color: 'text-rose-600',
+                            },
+                            {
+                                label: 'Commandes lancées',
+                                value: ordersTotal,
+                                color: 'text-amber-700',
+                            },
+                            {
+                                label: 'Ventes confirmées',
+                                value: funnel.ordersPaid,
+                                color: 'text-green-700',
+                            },
+                        ].map((item, index) => (
+                            <div
+                                key={item.label}
+                                className={`px-4 ${
+                                    index > 0
+                                        ? 'border-t pt-4 sm:border-l sm:border-t-0 sm:pl-4 sm:pt-0'
+                                        : ''
+                                }`}
+                            >
+                                <p className="text-sm text-gray-500">
+                                    {item.label}
+                                </p>
+                                <p
+                                    className={`mt-1 text-2xl font-bold ${item.color}`}
+                                >
+                                    {item.value}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <p className="mt-6 border-t pt-4 text-sm text-gray-500">
+                        Taux de conversion (panier → vente confirmée) :{' '}
+                        <span className="font-semibold text-gray-900">
+                            {funnel.cartsTotal > 0
+                                ? (
+                                      (funnel.ordersPaid /
+                                          funnel.cartsTotal) *
+                                      100
+                                  ).toFixed(1)
+                                : '0'}
+                            %
+                        </span>
+                        {' · '}
+                        Commandes en attente de paiement :{' '}
+                        <span className="font-semibold text-gray-900">
+                            {funnel.ordersPending}
+                        </span>
+                    </p>
                 </div>
                 </>
                 )}

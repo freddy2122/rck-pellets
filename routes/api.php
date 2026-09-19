@@ -125,6 +125,7 @@ Route::get('/orders/{token}', [OrderController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/orders', [OrderController::class, 'index']);
+    Route::get('/admin/orders/funnel', [OrderController::class, 'funnel']);
     Route::get('/admin/orders/export', [OrderController::class, 'export']);
     Route::get('/admin/orders/{order}', [OrderController::class, 'showAdmin']);
     Route::patch('/admin/orders/{order}', [OrderController::class, 'updateStatus']);

@@ -176,6 +176,27 @@ class OrderController extends Controller
         return response()->json($order->toStorefrontArray());
     }
 
+    /**
+     * Entonnoir de vente : paniers crees, abandonnes, commandes lancees et
+     * ventes confirmees, pour l'apercu du tableau de bord.
+     */
+    public function funnel()
+    {
+        return response()->json([
+            'cartsTotal' => Cart::query()->count(),
+            'cartsAbandoned' => Cart::query()->abandoned()->count(),
+            'ordersPending' => Order::query()
+                ->where('status', 'pending_payment')
+                ->count(),
+            'ordersPaid' => Order::query()
+                ->whereIn('status', ['paid', 'preparing', 'shipped', 'delivered'])
+                ->count(),
+            'ordersCancelled' => Order::query()
+                ->where('status', 'cancelled')
+                ->count(),
+        ]);
+    }
+
     public function index(Request $request)
     {
         $orders = $this->adminQuery($request)
