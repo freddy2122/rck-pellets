@@ -9,6 +9,10 @@ echo "🚀 Déploiement vers Hostinger..."
 REMOTE_HOST="185.166.188.65"
 REMOTE_PORT="65002"
 REMOTE_USER="u220939269"
+# Cle dediee au deploiement (ssh-agent n'a pas cette cle par defaut, donc on
+# la passe explicitement a chaque ssh/rsync plutot que de dependre du trousseau).
+SSH_KEY="${HOME}/.ssh/github_hostinger"
+SSH_OPTS="-p ${REMOTE_PORT} -i ${SSH_KEY} -o IdentitiesOnly=yes"
 # Le php du PATH est en 8.3 sur ce serveur, incompatible avec les dependances
 # (>= 8.4.1) : toutes les commandes artisan echouaient silencieusement.
 PHP_BIN="/opt/alt/php84/usr/bin/php"
@@ -42,7 +46,7 @@ fi
 
 # Copie des fichiers via rsync
 echo "📦 Copie des fichiers..."
-rsync -avz -e "ssh -p ${REMOTE_PORT}" --delete \
+rsync -avz -e "ssh ${SSH_OPTS}" --delete \
   --exclude 'node_modules' \
   --exclude '.git' \
   --exclude '.github' \
@@ -62,7 +66,7 @@ rsync -avz -e "ssh -p ${REMOTE_PORT}" --delete \
   ./ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/
 
 echo "📦 Copie des dépendances PHP..."
-rsync -avz -e "ssh -p ${REMOTE_PORT}" --delete \
+rsync -avz -e "ssh ${SSH_OPTS}" --delete \
   "${VENDOR_BUILD}/vendor/" ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/vendor/
 
 # Le docroot expose le contenu de public/ ; il doit suivre le build.
@@ -70,14 +74,14 @@ rsync -avz -e "ssh -p ${REMOTE_PORT}" --delete \
 # REMOTE_PATH) : l'ecraser avec le public/index.php standard de Laravel
 # mettrait le site hors ligne. Ne jamais le transferer.
 echo "📦 Copie des assets publics vers le docroot..."
-rsync -avz -e "ssh -p ${REMOTE_PORT}" \
+rsync -avz -e "ssh ${SSH_OPTS}" \
   --exclude 'storage' \
   --exclude 'index.php' \
   public/ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DOCROOT}/
 
 # Exécution des commandes sur le serveur distant
 echo "🔧 Configuration sur le serveur..."
-ssh -p ${REMOTE_PORT} ${REMOTE_USER}@${REMOTE_HOST} << EOF
+ssh ${SSH_OPTS} ${REMOTE_USER}@${REMOTE_HOST} << EOF
   cd ${REMOTE_PATH}
   
   # bootstrap/cache n'est pas transfere : il est regenere ici a partir du
