@@ -64,6 +64,9 @@
                                 siguientes.
                             @endif
                             Concepto: <strong>{{ $order->number }}</strong>.
+                            @if (!empty($bank['concepto']))
+                                {{ $bank['concepto'] }}
+                            @endif
                         </td>
                     </tr>
 
@@ -89,6 +92,9 @@
                                 Titular: {{ $holder }}
                                 @if (!empty($bank['name']))
                                     · Banco: {{ $bank['name'] }}
+                                @endif
+                                @if (!empty($bank['tipoTransferencia']))
+                                    · Tipo de transferencia: {{ $bank['tipoTransferencia'] }}
                                 @endif
                             </div>
                         </td>

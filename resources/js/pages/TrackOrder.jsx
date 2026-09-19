@@ -83,7 +83,7 @@ export default function TrackOrder() {
                                 onChange={(event) =>
                                     setNumber(event.target.value)
                                 }
-                                placeholder="1003"
+                                placeholder="JG-000042"
                                 required
                                 className="w-full rounded-lg border border-[#d0d0d0] px-3 py-3 outline-none focus:border-[#1773b8]"
                             />

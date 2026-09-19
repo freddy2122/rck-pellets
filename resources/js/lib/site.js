@@ -3,7 +3,7 @@ export const SITE = {
     legalName: 'Jardines Gerardo',
     nif: 'B45617404',
     nifFormatted: 'B45617404',
-    email: 'contato@rckpelletslda.pt',
+    email: 'info@jardinesgerardolienashop.es',
     phone: '+34 696 10 20 70',
     phoneHref: 'tel:+34696102070',
     whatsapp: '34696102070',
@@ -30,6 +30,8 @@ export const SITE = {
         name: '',
         iban: '',
         bic: '',
+        concepto: '',
+        tipoTransferencia: '',
     },
 };
 

@@ -101,7 +101,9 @@ class OrderController extends Controller
             'pay_by' => now()->addDays(7),
         ]);
 
-        $order->number = (string) (1000 + $order->id);
+        // Prefixe alphanumerique plutot qu'un simple compteur, pour un numero
+        // de commande plus professionnel (ex. JG-000042).
+        $order->number = 'JG-'.str_pad((string) $order->id, 6, '0', STR_PAD_LEFT);
         $order->save();
 
         // Le panier correspondant sort de la liste des abandons.

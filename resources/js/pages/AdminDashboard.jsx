@@ -99,6 +99,8 @@ export default function AdminDashboard() {
         name: '',
         iban: '',
         bic: '',
+        concepto: '',
+        tipoTransferencia: '',
     });
     const [savingBank, setSavingBank] = useState(false);
     const [contactForm, setContactForm] = useState({
@@ -245,6 +247,8 @@ export default function AdminDashboard() {
                     name: bankData.name || '',
                     iban: bankData.iban || '',
                     bic: bankData.bic || '',
+                    concepto: bankData.concepto || '',
+                    tipoTransferencia: bankData.tipoTransferencia || '',
                 });
             }
 
@@ -1218,6 +1222,8 @@ export default function AdminDashboard() {
                 name: data.name || '',
                 iban: data.iban || '',
                 bic: data.bic || '',
+                concepto: data.concepto || '',
+                tipoTransferencia: data.tipoTransferencia || '',
             });
         } catch (err) {
             setError(err.message);
@@ -2254,6 +2260,38 @@ export default function AdminDashboard() {
                                 }
                                 required
                                 className="w-full rounded-xl border border-gray-300 px-4 py-3 font-mono outline-none focus:border-green-700"
+                            />
+                        </label>
+                        <label className="block text-sm">
+                            <span className="mb-1 block font-medium text-gray-700">
+                                Concepto (instrucciones adicionales)
+                            </span>
+                            <input
+                                value={bankForm.concepto}
+                                onChange={(event) =>
+                                    setBankForm((current) => ({
+                                        ...current,
+                                        concepto: event.target.value,
+                                    }))
+                                }
+                                placeholder="Ej. Indica tu nombre y el número de pedido"
+                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-green-700"
+                            />
+                        </label>
+                        <label className="block text-sm">
+                            <span className="mb-1 block font-medium text-gray-700">
+                                Tipo de transferencia
+                            </span>
+                            <input
+                                value={bankForm.tipoTransferencia}
+                                onChange={(event) =>
+                                    setBankForm((current) => ({
+                                        ...current,
+                                        tipoTransferencia: event.target.value,
+                                    }))
+                                }
+                                placeholder="Ej. Transferencia SEPA"
+                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-green-700"
                             />
                         </label>
                         <div className="md:col-span-2">
