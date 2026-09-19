@@ -25,15 +25,15 @@ import { useNavigate } from 'react-router-dom';
 import { statusClass } from '../lib/orderStatus';
 
 const NAV_SECTIONS = [
-    { id: 'stats', label: 'Resumen', icon: LayoutDashboard },
-    { id: 'products', label: 'Productos', icon: Package },
-    { id: 'orders', label: 'Pedidos', icon: Truck },
-    { id: 'carts', label: 'Carritos abandonados', icon: ShoppingCart },
-    { id: 'guides', label: 'Guías', icon: BookOpen },
-    { id: 'messages', label: 'Mensajes', icon: MessageSquare },
-    { id: 'bank', label: 'Datos bancarios', icon: Landmark },
-    { id: 'contact', label: 'Datos de contacto', icon: Mail },
-    { id: 'quality', label: 'Calidad y sostenibilidad', icon: ImageIcon },
+    { id: 'stats', label: 'Résumé', icon: LayoutDashboard },
+    { id: 'products', label: 'Produits', icon: Package },
+    { id: 'orders', label: 'Commandes', icon: Truck },
+    { id: 'carts', label: 'Paniers abandonnés', icon: ShoppingCart },
+    { id: 'guides', label: 'Guides', icon: BookOpen },
+    { id: 'messages', label: 'Messages', icon: MessageSquare },
+    { id: 'bank', label: 'Coordonnées bancaires', icon: Landmark },
+    { id: 'contact', label: 'Coordonnées publiques', icon: Mail },
+    { id: 'quality', label: 'Qualité et durabilité', icon: ImageIcon },
 ];
 
 export default function AdminDashboard() {
@@ -1147,7 +1147,7 @@ export default function AdminDashboard() {
                 const first = data.errors
                     ? Object.values(data.errors)[0][0]
                     : data.message;
-                throw new Error(first || "Impossible d'enregistrer la guía.");
+                throw new Error(first || "Impossible d'enregistrer le guide.");
             }
 
             await loadArticles();
@@ -2089,8 +2089,8 @@ export default function AdminDashboard() {
 
                             <div>
                                 <h3 className="font-bold text-gray-900">
-                                    Qualidade e
-                                    sustentabilidade
+                                    Qualité et
+                                    durabilité
                                 </h3>
 
                                 <p className="text-sm text-gray-500">
@@ -2113,7 +2113,7 @@ export default function AdminDashboard() {
                                         src={
                                             qualityImagePreview
                                         }
-                                        alt="Qualidade e sustentabilidade"
+                                        alt="Qualité et durabilité"
                                         className="h-72 w-full rounded-xl object-cover"
                                     />
 
