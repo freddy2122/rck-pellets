@@ -77,11 +77,16 @@ export default function Privacy() {
                 Cómo compartimos tus datos
             </h2>
             <p>
-                Solo compartimos tus datos personales con proveedores que
-                actúan en nuestro nombre (alojamiento web y envío de correo
-                transaccional) y, cuando la ley lo exige, con las
-                autoridades competentes. No vendemos ni cedemos tus datos a
-                terceros con fines publicitarios.
+                Compartimos tus datos personales con proveedores que actúan
+                en nuestro nombre (alojamiento web y envío de correo
+                transaccional), con las autoridades competentes cuando la
+                ley lo exige y, únicamente si aceptas las cookies de
+                análisis en el banner de este sitio, con Meta (Meta Pixel),
+                para medir el rendimiento de nuestras campañas publicitarias
+                en Facebook e Instagram. Puedes retirar este consentimiento
+                en cualquier momento borrando los datos de navegación de tu
+                navegador y volviendo a elegir «Solo esenciales» en el
+                banner. No vendemos tus datos a terceros.
             </p>
 
             <h2 className="text-xl font-bold text-stone-900">

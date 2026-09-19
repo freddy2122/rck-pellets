@@ -11,6 +11,7 @@ import WhatsAppButton from './components/WhatsAppButton';
 import MobileTabBar from './components/MobileTabBar';
 import CartNotification from './components/CartNotification';
 import ScrollToTop from './components/ScrollToTop';
+import MetaPixel from './components/MetaPixel';
 
 import Home from './pages/Home';
 import Products from './pages/Products';
@@ -52,6 +53,7 @@ function App() {
             <SiteProvider>
             <CartProvider>
                 <ScrollToTop />
+                <MetaPixel />
                 <Routes>
                     <Route
                         path="/"

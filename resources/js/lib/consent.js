@@ -64,3 +64,11 @@ export function useCookieBannerVisible() {
 
     return value === null;
 }
+
+/**
+ * 'all', 'essential' ou null (pas encore repondu) — utilise pour n'activer
+ * les cookies non essentiels (ex. pixel Meta) qu'avec consentement explicite.
+ */
+export function useCookieConsent() {
+    return useSyncExternalStore(subscribe, getSnapshot, () => null);
+}

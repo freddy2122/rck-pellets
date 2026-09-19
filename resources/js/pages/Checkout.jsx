@@ -191,6 +191,15 @@ export default function Checkout() {
 
             saveLastOrder(placedOrder);
 
+            if (typeof window.fbq === 'function') {
+                window.fbq('track', 'Purchase', {
+                    value: totals.total,
+                    currency: 'EUR',
+                    content_ids: items.map((item) => item.id),
+                    content_type: 'product',
+                });
+            }
+
             setPlaced(true);
             clearCart();
             navigate(
