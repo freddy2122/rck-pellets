@@ -207,7 +207,6 @@ class SiteContentController extends Controller
             'name' => ['nullable', 'string', 'max:180'],
             'iban' => ['required', 'string', 'max:42'],
             'bic' => ['required', 'string', 'max:16'],
-            'concepto' => ['nullable', 'string', 'max:180'],
             'tipoTransferencia' => ['nullable', 'string', 'max:60'],
         ]);
 
@@ -216,7 +215,6 @@ class SiteContentController extends Controller
             'name' => trim((string) ($validated['name'] ?? '')),
             'iban' => strtoupper(preg_replace('/\s+/', '', $validated['iban'])),
             'bic' => strtoupper(trim($validated['bic'])),
-            'concepto' => trim((string) ($validated['concepto'] ?? '')),
             'tipoTransferencia' => trim((string) ($validated['tipoTransferencia'] ?? '')),
         ];
 

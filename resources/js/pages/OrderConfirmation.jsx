@@ -192,11 +192,6 @@ export default function OrderConfirmation() {
                                 label="Concepto"
                                 value={order.id}
                             />
-                            {bank.concepto ? (
-                                <p className="text-xs leading-5 text-[#6d6d6d]">
-                                    {bank.concepto}
-                                </p>
-                            ) : null}
                             <CopyRow label="Importe" value={amount} />
                         </div>
                     </div>

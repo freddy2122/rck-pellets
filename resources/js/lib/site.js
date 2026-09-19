@@ -30,7 +30,6 @@ export const SITE = {
         name: '',
         iban: '',
         bic: '',
-        concepto: '',
         tipoTransferencia: '',
     },
 };

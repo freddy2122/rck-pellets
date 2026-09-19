@@ -22,7 +22,6 @@ class SiteContent extends Model
             'name' => '',
             'iban' => env('BANK_IBAN', ''),
             'bic' => env('BANK_BIC', ''),
-            'concepto' => '',
             'tipoTransferencia' => '',
         ];
     }
@@ -42,7 +41,6 @@ class SiteContent extends Model
             'name' => trim((string) ($stored['name'] ?? '')),
             'iban' => trim((string) ($stored['iban'] ?? $defaults['iban'])) ?: $defaults['iban'],
             'bic' => trim((string) ($stored['bic'] ?? $defaults['bic'])) ?: $defaults['bic'],
-            'concepto' => trim((string) ($stored['concepto'] ?? '')),
             'tipoTransferencia' => trim((string) ($stored['tipoTransferencia'] ?? '')),
         ];
     }

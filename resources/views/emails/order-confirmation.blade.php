@@ -64,9 +64,6 @@
                                 siguientes.
                             @endif
                             Concepto: <strong>{{ $order->number }}</strong>.
-                            @if (!empty($bank['concepto']))
-                                {{ $bank['concepto'] }}
-                            @endif
                         </td>
                     </tr>
 

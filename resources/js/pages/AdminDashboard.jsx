@@ -4,6 +4,7 @@ import {
     LayoutDashboard,
     LogOut,
     Mail,
+    MessageSquare,
     Package,
     Truck,
     Plus,
@@ -23,8 +24,42 @@ import { useNavigate } from 'react-router-dom';
 
 import { statusClass } from '../lib/orderStatus';
 
+const NAV_SECTIONS = [
+    { id: 'stats', label: 'Resumen', icon: LayoutDashboard },
+    { id: 'products', label: 'Productos', icon: Package },
+    { id: 'orders', label: 'Pedidos', icon: Truck },
+    { id: 'carts', label: 'Carritos abandonados', icon: ShoppingCart },
+    { id: 'guides', label: 'Guías', icon: BookOpen },
+    { id: 'messages', label: 'Mensajes', icon: MessageSquare },
+    { id: 'bank', label: 'Datos bancarios', icon: Landmark },
+    { id: 'contact', label: 'Datos de contacto', icon: Mail },
+    { id: 'quality', label: 'Calidad y sostenibilidad', icon: ImageIcon },
+];
+
 export default function AdminDashboard() {
     const navigate = useNavigate();
+
+    const [activeSection, setActiveSection] = useState(() => {
+        if (typeof window === 'undefined') {
+            return 'stats';
+        }
+
+        const fromUrl = new URLSearchParams(window.location.search).get(
+            'section',
+        );
+
+        return NAV_SECTIONS.some((item) => item.id === fromUrl)
+            ? fromUrl
+            : 'stats';
+    });
+
+    const goToSection = (id) => {
+        setActiveSection(id);
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('section', id);
+        window.history.replaceState({}, '', url);
+    };
 
     const [user, setUser] = useState(null);
     const [products, setProducts] = useState([]);
@@ -99,7 +134,6 @@ export default function AdminDashboard() {
         name: '',
         iban: '',
         bic: '',
-        concepto: '',
         tipoTransferencia: '',
     });
     const [savingBank, setSavingBank] = useState(false);
@@ -247,7 +281,6 @@ export default function AdminDashboard() {
                     name: bankData.name || '',
                     iban: bankData.iban || '',
                     bic: bankData.bic || '',
-                    concepto: bankData.concepto || '',
                     tipoTransferencia: bankData.tipoTransferencia || '',
                 });
             }
@@ -1222,7 +1255,6 @@ export default function AdminDashboard() {
                 name: data.name || '',
                 iban: data.iban || '',
                 bic: data.bic || '',
-                concepto: data.concepto || '',
                 tipoTransferencia: data.tipoTransferencia || '',
             });
         } catch (err) {
@@ -1449,11 +1481,39 @@ export default function AdminDashboard() {
                     </p>
                 </div>
 
+                <div className="mt-8 flex flex-col gap-8 lg:flex-row">
+                    <aside className="lg:w-64 lg:shrink-0">
+                        <nav className="flex gap-2 overflow-x-auto pb-2 lg:sticky lg:top-8 lg:flex-col lg:gap-1 lg:overflow-visible lg:rounded-2xl lg:bg-white lg:p-3 lg:shadow-sm lg:pb-3">
+                            {NAV_SECTIONS.map(
+                                ({ id, label, icon: Icon }) => (
+                                    <button
+                                        key={id}
+                                        type="button"
+                                        onClick={() => goToSection(id)}
+                                        className={`flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition lg:w-full ${
+                                            activeSection === id
+                                                ? 'bg-green-800 text-white'
+                                                : 'bg-white text-gray-600 hover:bg-gray-100 lg:bg-transparent'
+                                        }`}
+                                    >
+                                        <Icon size={18} />
+                                        <span className="whitespace-nowrap">
+                                            {label}
+                                        </span>
+                                    </button>
+                                ),
+                            )}
+                        </nav>
+                    </aside>
+
+                    <div className="min-w-0 flex-1">
+                {activeSection === 'stats' && (
+                <>
                 {/* ---------------------------------------------------------------- */}
                 {/* STATISTIQUES */}
                 {/* ---------------------------------------------------------------- */}
 
-                <div className="mt-8 grid gap-6 md:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-3">
                     <div className="rounded-2xl bg-white p-6 shadow-sm">
                         <div className="flex items-center justify-between">
                             <div>
@@ -1518,12 +1578,16 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                 </div>
+                </>
+                )}
 
+                {activeSection === 'products' && (
+                <>
                 {/* ---------------------------------------------------------------- */}
                 {/* PRODUITS */}
                 {/* ---------------------------------------------------------------- */}
 
-                <section className="mt-10 rounded-2xl bg-white shadow-sm">
+                <section className="rounded-2xl bg-white shadow-sm">
                     <div className="flex flex-col gap-4 border-b p-6 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h3 className="text-xl font-bold text-gray-900">
@@ -2005,12 +2069,16 @@ export default function AdminDashboard() {
                         )}
                     </div>
                 </section>
+                </>
+                )}
 
+                {activeSection === 'quality' && (
+                <>
                 {/* ---------------------------------------------------------------- */}
                 {/* QUALIDADE E SUSTENTABILIDADE */}
                 {/* ---------------------------------------------------------------- */}
 
-                <section className="mt-8 rounded-2xl bg-white shadow-sm">
+                <section className="rounded-2xl bg-white shadow-sm">
                     <div className="border-b p-6">
                         <div className="flex items-center gap-3">
                             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-green-700">
@@ -2175,12 +2243,16 @@ export default function AdminDashboard() {
                         </p>
                     </div>
                 </section>
+                </>
+                )}
 
+                {activeSection === 'bank' && (
+                <>
                 {/* ---------------------------------------------------------------- */}
                 {/* COORDONNÉES BANCAIRES */}
                 {/* ---------------------------------------------------------------- */}
 
-                <section className="mt-8 rounded-2xl bg-white shadow-sm">
+                <section className="rounded-2xl bg-white shadow-sm">
                     <div className="flex items-center gap-3 border-b p-6">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-green-800">
                             <Landmark size={21} />
@@ -2264,22 +2336,6 @@ export default function AdminDashboard() {
                         </label>
                         <label className="block text-sm">
                             <span className="mb-1 block font-medium text-gray-700">
-                                Concepto (instrucciones adicionales)
-                            </span>
-                            <input
-                                value={bankForm.concepto}
-                                onChange={(event) =>
-                                    setBankForm((current) => ({
-                                        ...current,
-                                        concepto: event.target.value,
-                                    }))
-                                }
-                                placeholder="Ej. Indica tu nombre y el número de pedido"
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-green-700"
-                            />
-                        </label>
-                        <label className="block text-sm">
-                            <span className="mb-1 block font-medium text-gray-700">
                                 Tipo de transferencia
                             </span>
                             <input
@@ -2307,12 +2363,16 @@ export default function AdminDashboard() {
                         </div>
                     </form>
                 </section>
+                </>
+                )}
 
+                {activeSection === 'contact' && (
+                <>
                 {/* ---------------------------------------------------------------- */}
                 {/* COORDONNÉES PUBLIQUES */}
                 {/* ---------------------------------------------------------------- */}
 
-                <section className="mt-8 rounded-2xl bg-white shadow-sm">
+                <section className="rounded-2xl bg-white shadow-sm">
                     <div className="flex items-center gap-3 border-b p-6">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
                             <Mail size={21} />
@@ -2457,12 +2517,16 @@ export default function AdminDashboard() {
                         </div>
                     </form>
                 </section>
+                </>
+                )}
 
+                {activeSection === 'orders' && (
+                <>
                 {/* ---------------------------------------------------------------- */}
                 {/* COMMANDES */}
                 {/* ---------------------------------------------------------------- */}
 
-                <section className="mt-8 rounded-2xl bg-white shadow-sm">
+                <section className="rounded-2xl bg-white shadow-sm">
                     <div className="flex items-center gap-3 border-b p-6">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
                             <Truck size={21} />
@@ -2643,12 +2707,16 @@ export default function AdminDashboard() {
                         </div>
                     )}
                 </section>
+                </>
+                )}
 
+                {activeSection === 'guides' && (
+                <>
                 {/* ---------------------------------------------------------------- */}
                 {/* GUIDES */}
                 {/* ---------------------------------------------------------------- */}
 
-                <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+                <section className="rounded-2xl bg-white p-6 shadow-sm">
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
                             <BookOpen size={21} />
@@ -2902,12 +2970,16 @@ export default function AdminDashboard() {
                         </ul>
                     )}
                 </section>
+                </>
+                )}
 
+                {activeSection === 'carts' && (
+                <>
                 {/* ---------------------------------------------------------------- */}
                 {/* PANIERS ABANDONNÉS */}
                 {/* ---------------------------------------------------------------- */}
 
-                <section className="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm">
+                <section className="overflow-hidden rounded-2xl bg-white shadow-sm">
                     <div className="flex items-center gap-3 p-6">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-100 text-rose-700">
                             <ShoppingCart size={21} />
@@ -3011,12 +3083,16 @@ export default function AdminDashboard() {
                         </div>
                     )}
                 </section>
+                </>
+                )}
 
+                {activeSection === 'messages' && (
+                <>
                 {/* ---------------------------------------------------------------- */}
                 {/* MESSAGES */}
                 {/* ---------------------------------------------------------------- */}
 
-                <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+                <section className="rounded-2xl bg-white p-6 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
                             <Mail
@@ -3100,6 +3176,10 @@ export default function AdminDashboard() {
                         </div>
                     )}
                 </section>
+                </>
+                )}
+                    </div>
+                </div>
             </div>
 
             {/* ---------------------------------------------------------------- */}
