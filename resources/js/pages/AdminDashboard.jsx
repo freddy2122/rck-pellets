@@ -66,6 +66,7 @@ export default function AdminDashboard() {
     const [orders, setOrders] = useState([]);
     const [messages, setMessages] = useState([]);
     const [updatingOrderId, setUpdatingOrderId] = useState(null);
+    const [editingStatusId, setEditingStatusId] = useState(null);
     // Total non filtre, pour l'indicateur du tableau de bord.
     const [ordersTotal, setOrdersTotal] = useState(0);
     const [funnel, setFunnel] = useState({
@@ -982,6 +983,7 @@ export default function AdminDashboard() {
             setError(err.message);
         } finally {
             setUpdatingOrderId(null);
+            setEditingStatusId(null);
         }
     };
 
@@ -2741,42 +2743,75 @@ export default function AdminDashboard() {
                                                 €
                                             </td>
                                             <td className="px-6 py-4">
-                                                <select
-                                                    value={order.status}
-                                                    disabled={
-                                                        updatingOrderId ===
-                                                        order.id
-                                                    }
-                                                    onChange={(event) =>
-                                                        updateOrderStatus(
-                                                            order.id,
-                                                            event.target.value,
-                                                        )
-                                                    }
-                                                    className={`rounded-lg border px-3 py-2 text-sm font-semibold ${statusClass(
-                                                        order.status,
-                                                        'select',
-                                                    )}`}
-                                                >
-                                                    <option value="pending_payment">
-                                                        Pago pendiente
-                                                    </option>
-                                                    <option value="paid">
-                                                        Pago confirmado
-                                                    </option>
-                                                    <option value="preparing">
-                                                        En preparación
-                                                    </option>
-                                                    <option value="shipped">
-                                                        Enviado
-                                                    </option>
-                                                    <option value="delivered">
-                                                        Entregado
-                                                    </option>
-                                                    <option value="cancelled">
-                                                        Cancelado
-                                                    </option>
-                                                </select>
+                                                {editingStatusId ===
+                                                order.id ? (
+                                                    <select
+                                                        autoFocus
+                                                        value={order.status}
+                                                        disabled={
+                                                            updatingOrderId ===
+                                                            order.id
+                                                        }
+                                                        onBlur={() =>
+                                                            setEditingStatusId(
+                                                                null,
+                                                            )
+                                                        }
+                                                        onChange={(event) =>
+                                                            updateOrderStatus(
+                                                                order.id,
+                                                                event.target
+                                                                    .value,
+                                                            )
+                                                        }
+                                                        className={`rounded-lg border px-3 py-2 text-sm font-semibold ${statusClass(
+                                                            order.status,
+                                                            'select',
+                                                        )}`}
+                                                    >
+                                                        <option value="pending_payment">
+                                                            Pago pendiente
+                                                        </option>
+                                                        <option value="paid">
+                                                            Pago confirmado
+                                                        </option>
+                                                        <option value="preparing">
+                                                            En preparación
+                                                        </option>
+                                                        <option value="shipped">
+                                                            Enviado
+                                                        </option>
+                                                        <option value="delivered">
+                                                            Entregado
+                                                        </option>
+                                                        <option value="cancelled">
+                                                            Cancelado
+                                                        </option>
+                                                    </select>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setEditingStatusId(
+                                                                order.id,
+                                                            )
+                                                        }
+                                                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition hover:opacity-80 ${statusClass(
+                                                            order.status,
+                                                            'badge',
+                                                        )}`}
+                                                        title="Modifier le statut"
+                                                    >
+                                                        <span
+                                                            className={`h-2 w-2 rounded-full ${statusClass(
+                                                                order.status,
+                                                                'dot',
+                                                            )}`}
+                                                        />
+                                                        {order.statusLabel}
+                                                        <Pencil size={12} />
+                                                    </button>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <button

@@ -146,9 +146,11 @@ export default function OrderConfirmation() {
                     </h2>
                     <p className="mt-2 text-sm leading-6 text-[#4d4d4d]">
                         Completa el pago por transferencia SEPA con los datos
-                        siguientes. Recibirás un e-mail de confirmación cuando
-                        identifiquemos el ingreso ({paymentLabel(order.payment)}
-                        ) en {order.email} o al {SITE.phone}.
+                        siguientes. Te avisaremos por e-mail a {order.email}{' '}
+                        en cuanto identifiquemos el ingreso.
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-[#4d4d4d]">
+                        ¿Dudas sobre tu pedido? Llámanos al {SITE.phone}.
                     </p>
 
                     <div className="mt-4 rounded-lg bg-[#ffffff] px-4 py-4">
