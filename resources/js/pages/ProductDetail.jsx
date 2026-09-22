@@ -172,13 +172,19 @@ export default function ProductDetail() {
                         </h1>
 
                         {product.category === 'pellets' && (
-                            <img
-                                src="/images/enplus-a1.png"
-                                alt="Certificado ENplus A1"
-                                loading="lazy"
-                                decoding="async"
-                                className="mt-3 h-16 w-16"
-                            />
+                            <div className="mt-3 flex items-center gap-3">
+                                <img
+                                    src="/images/enplus-a1.png"
+                                    alt="Certificado ENplus A1"
+                                    loading="lazy"
+                                    decoding="async"
+                                    className="h-16 w-16 shrink-0"
+                                />
+                                <p className="text-sm text-ink/70">
+                                    Este pellet está certificado con el sello
+                                    ENplus A1.
+                                </p>
+                            </div>
                         )}
 
                         {price && (
