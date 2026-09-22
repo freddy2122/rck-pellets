@@ -12,6 +12,7 @@ import MobileTabBar from './components/MobileTabBar';
 import CartNotification from './components/CartNotification';
 import ScrollToTop from './components/ScrollToTop';
 import MetaPixel from './components/MetaPixel';
+import GoogleTag from './components/GoogleTag';
 
 import Home from './pages/Home';
 import Products from './pages/Products';
@@ -54,6 +55,7 @@ function App() {
             <CartProvider>
                 <ScrollToTop />
                 <MetaPixel />
+                <GoogleTag />
                 <Routes>
                     <Route
                         path="/"

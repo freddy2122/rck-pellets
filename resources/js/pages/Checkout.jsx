@@ -200,6 +200,20 @@ export default function Checkout() {
                 });
             }
 
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'purchase', {
+                    transaction_id: placedOrder.token || placedOrder.id,
+                    value: totals.total,
+                    currency: 'EUR',
+                    items: items.map((item) => ({
+                        item_id: item.id,
+                        item_name: item.name,
+                        price: item.price,
+                        quantity: item.quantity,
+                    })),
+                });
+            }
+
             setPlaced(true);
             clearCart();
             navigate(

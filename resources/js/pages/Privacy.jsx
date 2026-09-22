@@ -81,10 +81,11 @@ export default function Privacy() {
                 en nuestro nombre (alojamiento web y envío de correo
                 transaccional), con las autoridades competentes cuando la
                 ley lo exige y, únicamente si aceptas las cookies de
-                análisis en el banner de este sitio, con Meta (Meta Pixel),
-                para medir el rendimiento de nuestras campañas publicitarias
-                en Facebook e Instagram. Puedes retirar este consentimiento
-                en cualquier momento borrando los datos de navegación de tu
+                análisis en el banner de este sitio, con Meta (Meta Pixel) y
+                con Google (etiqueta de Google Ads), para medir el
+                rendimiento de nuestras campañas publicitarias en Facebook,
+                Instagram y Google. Puedes retirar este consentimiento en
+                cualquier momento borrando los datos de navegación de tu
                 navegador y volviendo a elegir «Solo esenciales» en el
                 banner. No vendemos tus datos a terceros.
             </p>

@@ -8,9 +8,9 @@ export default function ScrollToTop() {
     useEffect(() => {
         window.scrollTo(0, 0);
 
-        // Le pixel Meta ne suit qu'un PageView initial (chargement complet
-        // de la page) ; ici on le redeclenche a chaque changement de route
-        // du SPA pour que la navigation reelle soit suivie.
+        // Les pixels Meta et Google ne suivent qu'une page vue au
+        // chargement initial ; on la redeclenche a chaque changement de
+        // route du SPA pour que la navigation reelle soit suivie.
         if (isFirstRender.current) {
             isFirstRender.current = false;
             return;
@@ -18,6 +18,13 @@ export default function ScrollToTop() {
 
         if (typeof window.fbq === 'function') {
             window.fbq('track', 'PageView');
+        }
+
+        if (typeof window.gtag === 'function') {
+            window.gtag('event', 'page_view', {
+                page_path: pathname,
+                page_location: window.location.href,
+            });
         }
     }, [pathname]);
 
