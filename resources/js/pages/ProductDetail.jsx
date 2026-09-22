@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, LoaderCircle, Minus, Package, Plus, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, LoaderCircle, Minus, Package, Plus } from 'lucide-react';
 import { formatShopifyPrice, productImages, productMainImage } from '../lib/format';
 import { useCart } from '../lib/cart';
 import { SITE } from '../lib/site';
@@ -172,10 +172,13 @@ export default function ProductDetail() {
                         </h1>
 
                         {product.category === 'pellets' && (
-                            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-moss/10 px-3 py-1 text-xs font-semibold text-moss">
-                                <ShieldCheck size={14} />
-                                Certificado ENplus A1
-                            </span>
+                            <img
+                                src="/images/enplus-a1.png"
+                                alt="Certificado ENplus A1"
+                                loading="lazy"
+                                decoding="async"
+                                className="mt-3 h-16 w-16"
+                            />
                         )}
 
                         {price && (

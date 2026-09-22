@@ -103,6 +103,13 @@ export default function Footer() {
                         Pellets de madera premium y leña de calefacción, con
                         entrega rápida en España.
                     </p>
+                    <img
+                        loading="lazy"
+                        decoding="async"
+                        src="/images/enplus-a1.png"
+                        alt="Certificado ENplus A1"
+                        className="mt-4 h-14 w-14"
+                    />
                 </div>
             </div>
 
