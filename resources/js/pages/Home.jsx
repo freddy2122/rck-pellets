@@ -16,7 +16,7 @@ const reasons = [
     {
         icon: Award,
         title: 'Calidad certificada',
-        text: 'Leña y carbón seleccionados para un rendimiento óptimo y un sabor inigualable.',
+        text: 'Pellets certificados ENplus A1 y leña seleccionada para un rendimiento óptimo.',
     },
     {
         icon: Leaf,
