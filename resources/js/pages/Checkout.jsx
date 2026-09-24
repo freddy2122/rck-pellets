@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { LoaderCircle, Lock } from 'lucide-react';
 import CheckoutShell from '../components/CheckoutShell';
@@ -15,10 +15,11 @@ import {
     shippingFor,
     totalsFor,
 } from '../lib/checkout';
-import { PROVINCES } from '../lib/site';
+import { PROVINCES, SITE } from '../lib/site';
 import { findPhoneCountry } from '../lib/phoneCountries';
 import {
     formatCheckoutMoney,
+    formatIban,
     formatInternationalPhone,
     includedVat,
     isValidNif,
@@ -81,6 +82,18 @@ export default function Checkout() {
     const [placed, setPlaced] = useState(false);
     const [error, setError] = useState('');
     const [saved, setSaved] = useState(false);
+    const [bank, setBank] = useState(SITE.bank);
+
+    useEffect(() => {
+        fetch('/api/site-content/bank')
+            .then((response) => (response.ok ? response.json() : SITE.bank))
+            .then((data) => {
+                if (data && typeof data === 'object') {
+                    setBank({ ...SITE.bank, ...data });
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     const complete = addressIsComplete(form);
     const shipping = shippingFor(form);
@@ -486,6 +499,57 @@ export default function Checkout() {
                                     {selected && (
                                         <div className="border-t border-[#d0d0d0] bg-[#f5f5f5] px-4 py-4 text-sm leading-6 text-[#4d4d4d]">
                                             {method.hint}
+
+                                            <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg bg-white px-3 py-3 text-[#1a1a1a]">
+                                                <div>
+                                                    <p className="text-[11px] uppercase tracking-wide text-[#6d6d6d]">
+                                                        Titular
+                                                    </p>
+                                                    <p className="font-medium">
+                                                        {bank.holder}
+                                                    </p>
+                                                </div>
+                                                {bank.name ? (
+                                                    <div>
+                                                        <p className="text-[11px] uppercase tracking-wide text-[#6d6d6d]">
+                                                            Banco
+                                                        </p>
+                                                        <p className="font-medium">
+                                                            {bank.name}
+                                                        </p>
+                                                    </div>
+                                                ) : null}
+                                                <div>
+                                                    <p className="text-[11px] uppercase tracking-wide text-[#6d6d6d]">
+                                                        IBAN
+                                                    </p>
+                                                    <p className="font-medium">
+                                                        {formatIban(bank.iban)}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[11px] uppercase tracking-wide text-[#6d6d6d]">
+                                                        BIC / SWIFT
+                                                    </p>
+                                                    <p className="font-medium">
+                                                        {bank.bic}
+                                                    </p>
+                                                </div>
+                                                {bank.tipoTransferencia ? (
+                                                    <div>
+                                                        <p className="text-[11px] uppercase tracking-wide text-[#6d6d6d]">
+                                                            Tipo de
+                                                            transferencia
+                                                        </p>
+                                                        <p className="font-medium">
+                                                            {
+                                                                bank.tipoTransferencia
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                ) : null}
+                                            </div>
+
                                             <label className="mt-3 flex items-center gap-2 text-sm text-[#1a1a1a]">
                                                 <input
                                                     type="checkbox"

@@ -8,12 +8,12 @@ export const PAYMENT_METHODS = [
     {
         id: 'transferencia',
         label: 'Transferencia bancaria',
-        hint: 'Tras el pedido verás el IBAN, el BIC y la referencia en la página de confirmación.',
+        hint: 'Usa el número de pedido como concepto para identificar el pago.',
     },
     {
         id: 'cajero',
         label: 'Ingreso en cajero automático',
-        hint: 'Ingresa el importe en un cajero automático o en la ventanilla de tu banco, indicando el número de pedido como concepto. Verás el IBAN y la referencia en la confirmación.',
+        hint: 'Ingresa el importe en un cajero automático o en la ventanilla de tu banco, indicando el número de pedido como concepto.',
     },
 ];
 
