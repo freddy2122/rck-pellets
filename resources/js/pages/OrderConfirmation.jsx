@@ -9,13 +9,14 @@ import {
     estimatedDeliveryDate,
     formatDeliveryDate,
 } from '../lib/delivery';
-import { SITE, whatsappLink } from '../lib/site';
+import { MAPBOX_TOKEN, SITE, whatsappLink } from '../lib/site';
 
 export default function OrderConfirmation() {
     const { token } = useParams();
     const [newsletter, setNewsletter] = useState(false);
     const [remoteOrder, setRemoteOrder] = useState(null);
     const [bank, setBank] = useState(SITE.bank);
+    const [mapImage, setMapImage] = useState('');
     const [loading, setLoading] = useState(Boolean(token));
     const sessionOrder = useMemo(
         () => (typeof window === 'undefined' ? null : readLastOrder()),
@@ -63,6 +64,41 @@ export default function OrderConfirmation() {
             cancelled = true;
         };
     }, [token]);
+
+    useEffect(() => {
+        const current = remoteOrder || sessionOrder;
+
+        if (!current?.city) {
+            return undefined;
+        }
+
+        let cancelled = false;
+
+        const query = [current.city, current.district, 'España']
+            .filter(Boolean)
+            .join(', ');
+
+        fetch(
+            `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+                query,
+            )}.json?limit=1&access_token=${MAPBOX_TOKEN}`,
+        )
+            .then((response) => (response.ok ? response.json() : null))
+            .then((data) => {
+                const [lng, lat] = data?.features?.[0]?.center || [];
+
+                if (!cancelled && lng && lat) {
+                    setMapImage(
+                        `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-s+1773b8(${lng},${lat})/${lng},${lat},11,0/600x260@2x?access_token=${MAPBOX_TOKEN}`,
+                    );
+                }
+            })
+            .catch(() => {});
+
+        return () => {
+            cancelled = true;
+        };
+    }, [remoteOrder, sessionOrder]);
 
     const order = remoteOrder || sessionOrder;
 
@@ -138,6 +174,21 @@ export default function OrderConfirmation() {
                     </Link>
                 </div>
             </div>
+
+            {mapImage && (
+                <div className="relative mt-6 overflow-hidden rounded-lg border border-[#ddd]">
+                    <img
+                        src={mapImage}
+                        alt={`Zona de entrega: ${order.city}`}
+                        loading="lazy"
+                        className="block w-full"
+                    />
+                    <span className="absolute bottom-3 left-3 rounded-md bg-white px-3 py-1.5 text-xs font-semibold shadow">
+                        Ciudad: {order.city}
+                        {order.district ? ` · Provincia: ${order.district}` : ''}
+                    </span>
+                </div>
+            )}
 
             <section className="mt-8 overflow-hidden rounded-lg border border-[#ddd]">
                 <div className="px-5 py-5">

@@ -1,3 +1,8 @@
+// Token public Mapbox (pk....) : concu pour etre expose cote client,
+// contrairement a un token secret (sk...). Fourni via .env (VITE_MAPBOX_TOKEN)
+// plutot que code en dur, pour eviter qu'un scanner de secrets le bloque.
+export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
+
 export const SITE = {
     name: 'Jardines leña Shop',
     legalName: 'Jardines Gerardo',
