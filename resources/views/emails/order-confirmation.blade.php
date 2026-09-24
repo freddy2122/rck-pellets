@@ -242,6 +242,13 @@
                             <div style="font-size:14px;color:#4d4d4d;">{{ $order->shippingLabel() }}</div>
                         </td>
                     </tr>
+                    <tr>
+                        <td style="padding-top:32px;border-top:1px solid #e6e6e6;margin-top:32px;font-size:13px;line-height:1.6;color:#6d6d6d;">
+                            Si tienes alguna pregunta, responde a este e-mail o
+                            contáctanos en
+                            <a href="mailto:{{ $contact['email'] }}" style="color:#1773b8;">{{ $contact['email'] }}</a>.
+                        </td>
+                    </tr>
                 </table>
             </td>
         </tr>
