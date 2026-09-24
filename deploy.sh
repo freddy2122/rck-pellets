@@ -98,6 +98,10 @@ ssh ${SSH_OPTS} ${REMOTE_USER}@${REMOTE_HOST} << EOF
   # Catalogue : firstOrCreate/updateOrCreate sur le sku, sans risque a rejouer.
   ${PHP_BIN} artisan db:seed --class=CatalogSeeder --force
 
+  # Mise a jour ponctuelle du texte bancaire ; a retirer d'ici apres ce
+  # deploiement pour ne pas ecraser de futures modifications admin.
+  ${PHP_BIN} artisan db:seed --class=BankInstructionsSeeder --force
+
   # Visuels produits : associe chaque SKU a son image principale, sans
   # supprimer celles deja televersees depuis le back-office.
   ${PHP_BIN} artisan db:seed --class=ProductImageSeeder --force

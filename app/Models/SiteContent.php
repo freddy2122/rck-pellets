@@ -18,7 +18,7 @@ class SiteContent extends Model
     public static function defaultBank(): array
     {
         return [
-            'instructions' => "VERONICA PEREZAGUA GONZALEZ (imaginBank)\n\nIBAN: ES15 2100 6095 5002 0031 4230\nBIC: CAIXESBBXXX\nTipo de transferencia: Inmediata",
+            'instructions' => "Realiza tu pago por transferencia bancaria o depósito directo en nuestra cuenta. Indica tu número de pedido como referencia de la transferencia o depósito. Tu pedido no será enviado hasta que confirmemos el ingreso en nuestra cuenta.\n\nVERONICA PEREZAGUA GONZALEZ (imaginBank)\n\nIBAN: ES15 2100 6095 5002 0031 4230\nBIC: CAIXESBBXXX\nTipo de transferencia: Inmediato\n\nPor favor, realiza el pago y envíanos el justificante por WhatsApp o e-mail.",
         ];
     }
 
