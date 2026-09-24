@@ -61,6 +61,7 @@ export default function Checkout() {
 
         return merged;
     });
+    const [step, setStep] = useState('form');
     const [loading, setLoading] = useState(false);
     const [placed, setPlaced] = useState(false);
     const [error, setError] = useState('');
@@ -91,35 +92,55 @@ export default function Checkout() {
         setError('');
     };
 
+    const validate = () => {
+        if (!form.email.trim()) {
+            return 'Indica un e-mail de contacto.';
+        }
+
+        if (!form.firstName.trim() || !form.lastName.trim()) {
+            return 'Indica el nombre y los apellidos.';
+        }
+
+        if (!complete) {
+            return 'Completa la dirección, incluido el código postal de 5 dígitos.';
+        }
+
+        if (!isValidPhoneForCountry(form.phone, findPhoneCountry(form.phoneCountry))) {
+            return 'Indica un teléfono válido.';
+        }
+
+        return '';
+    };
+
+    const handleReview = (event) => {
+        event.preventDefault();
+
+        const validationError = validate();
+
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
+        setError('');
+        setStep('review');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         setError('');
 
-        if (!form.email.trim()) {
-            setError('Indica un e-mail de contacto.');
-            return;
-        }
+        const validationError = validate();
 
-        if (!form.firstName.trim() || !form.lastName.trim()) {
-            setError('Indica el nombre y los apellidos.');
-            return;
-        }
-
-        if (!complete) {
-            setError(
-                'Completa la dirección, incluido el código postal de 5 dígitos.',
-            );
+        if (validationError) {
+            setError(validationError);
+            setStep('form');
             return;
         }
 
         const phoneCountry = findPhoneCountry(form.phoneCountry);
-
-        if (!isValidPhoneForCountry(form.phone, phoneCountry)) {
-            setError('Indica un teléfono válido.');
-            return;
-        }
-
-const phone = formatInternationalPhone(form.phone, phoneCountry);
+        const phone = formatInternationalPhone(form.phone, phoneCountry);
         const payload = {
             email: form.email,
             firstName: form.firstName.trim(),
@@ -229,7 +250,9 @@ const phone = formatInternationalPhone(form.phone, phoneCountry);
                 />
             }
         >
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={step === 'form' ? handleReview : handleSubmit}>
+              {step === 'form' && (
+                <>
                 <section>
                     <h2 className="text-lg font-semibold">
                         Información de contacto
@@ -476,6 +499,101 @@ const phone = formatInternationalPhone(form.phone, phoneCountry);
                         </p>
                     )}
                 </section>
+                </>
+              )}
+
+              {step === 'review' && (
+                <>
+                <h2 className="text-lg font-semibold">
+                    Completar tu pedido
+                </h2>
+
+                <div className="mt-4 divide-y divide-[#eee] rounded-lg border border-[#d0d0d0]">
+                    <div className="flex items-start justify-between gap-3 px-4 py-3">
+                        <div>
+                            <p className="text-xs text-[#6d6d6d]">Contacto</p>
+                            <p className="mt-1 text-sm font-semibold">
+                                {form.email}
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setStep('form')}
+                            className="shrink-0 text-sm font-semibold text-[#1773b8] underline"
+                        >
+                            Cambiar
+                        </button>
+                    </div>
+
+                    <div className="flex items-start justify-between gap-3 px-4 py-3">
+                        <div>
+                            <p className="text-xs text-[#6d6d6d]">
+                                Enviar a
+                            </p>
+                            <p className="mt-1 text-sm leading-6">
+                                <span className="font-semibold">
+                                    {form.firstName} {form.lastName}
+                                </span>
+                                <br />
+                                {form.street}
+                                {form.address2 ? `, ${form.address2}` : ''}
+                                <br />
+                                {form.postalCode} {form.city},{' '}
+                                {form.district}, España
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setStep('form')}
+                            className="shrink-0 text-sm font-semibold text-[#1773b8] underline"
+                        >
+                            Cambiar
+                        </button>
+                    </div>
+
+                    <div className="px-4 py-3">
+                        <p className="text-xs text-[#6d6d6d]">Envío</p>
+                        <p className="mt-1 text-sm font-semibold">
+                            {shipping?.label} ·{' '}
+                            {formatCheckoutMoney(shipping?.price || 0)}
+                        </p>
+                        <p className="text-xs text-[#6d6d6d]">
+                            No hay más métodos de envío disponibles
+                        </p>
+                    </div>
+
+                    <div className="flex items-start justify-between gap-3 px-4 py-3">
+                        <div>
+                            <p className="text-xs text-[#6d6d6d]">Pago</p>
+                            <p className="mt-1 text-sm font-semibold">
+                                {
+                                    PAYMENT_METHODS.find(
+                                        (method) => method.id === form.payment,
+                                    )?.label
+                                }
+                            </p>
+                            {form.billingSame && (
+                                <p className="mt-1 text-sm leading-6 text-[#4d4d4d]">
+                                    {form.street}
+                                    {form.address2
+                                        ? `, ${form.address2}`
+                                        : ''}
+                                    , {form.postalCode} {form.city},{' '}
+                                    {form.district}, España
+                                </p>
+                            )}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setStep('form')}
+                            className="shrink-0 text-sm font-semibold text-[#1773b8] underline"
+                        >
+                            Cambiar
+                        </button>
+                    </div>
+                </div>
+                </>
+              )}
 
                 {error && (
                     <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -490,8 +608,10 @@ const phone = formatInternationalPhone(form.phone, phoneCountry);
                 >
                     {loading ? (
                         <LoaderCircle size={20} className="animate-spin" />
+                    ) : step === 'form' ? (
+                        'Revisar pedido'
                     ) : (
-                        'Pagar ahora'
+                        'Hacer mi pedido'
                     )}
                 </button>
                 <p className="mt-3 text-center text-xs leading-5 text-[#6d6d6d]">

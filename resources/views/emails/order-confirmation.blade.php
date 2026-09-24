@@ -59,7 +59,7 @@
                                 <strong>{{ $payBy }}</strong>, utilizando los datos
                                 siguientes.
                             @else
-                                Realiza el pago por transferencia SEPA antes del
+                                Realiza el pago por transferencia SEPA inmediata antes del
                                 <strong>{{ $payBy }}</strong>, utilizando los datos
                                 siguientes.
                             @endif

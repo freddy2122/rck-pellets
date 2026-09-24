@@ -9,7 +9,7 @@ import {
     estimatedDeliveryDate,
     formatDeliveryDate,
 } from '../lib/delivery';
-import { MAPBOX_TOKEN, SITE, whatsappLink } from '../lib/site';
+import { MAPBOX_TOKEN, SITE } from '../lib/site';
 
 export default function OrderConfirmation() {
     const { token } = useParams();
@@ -196,12 +196,20 @@ export default function OrderConfirmation() {
                         Hemos recibido tu pedido
                     </h2>
                     <p className="mt-2 text-sm leading-6 text-[#4d4d4d]">
-                        Completa el pago por transferencia SEPA con los datos
+                        Completa el pago por transferencia SEPA inmediata con
+                        los datos
                         siguientes. Te avisaremos por e-mail a {order.email}{' '}
                         en cuanto identifiquemos el ingreso.
                     </p>
                     <p className="mt-1 text-sm leading-6 text-[#4d4d4d]">
-                        ¿Dudas sobre tu pedido? Llámanos al {SITE.phone}.
+                        ¿Dudas sobre tu pedido? Escríbenos a{' '}
+                        <a
+                            href={`mailto:${SITE.email}`}
+                            className="font-medium text-[#1773b8] underline"
+                        >
+                            {SITE.email}
+                        </a>
+                        .
                     </p>
 
                     <div className="mt-4 rounded-lg bg-[#ffffff] px-4 py-4">
@@ -230,17 +238,6 @@ export default function OrderConfirmation() {
                         <p className="mt-4 border-t border-[#eee] pt-3 text-xs leading-5 text-[#6d6d6d]">
                             Para agilizar la confirmación, envíanos el
                             justificante del pago por{' '}
-                            <a
-                                href={whatsappLink(
-                                    `Hola, adjunto el justificante de mi transferencia para el pedido ${order.id}.`,
-                                )}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-medium text-[#1773b8] underline"
-                            >
-                                WhatsApp
-                            </a>{' '}
-                            o por{' '}
                             <a
                                 href={`mailto:${SITE.email}`}
                                 className="font-medium text-[#1773b8] underline"
