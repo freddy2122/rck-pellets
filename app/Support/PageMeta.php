@@ -38,7 +38,7 @@ class PageMeta
         ],
         'envios' => [
             'title' => 'Envíos, plazos y gastos de entrega',
-            'description' => 'Entrega en 2-5 días laborables en la Península por 2,99 € y 5-10 días en Baleares, Canarias, Ceuta y Melilla. Consulta plazos y condiciones de transporte.',
+            'description' => 'Entrega en 2-5 días laborables en la Península por 1,50 € y 5-10 días en Baleares, Canarias, Ceuta y Melilla. Consulta plazos y condiciones de transporte.',
         ],
         'seguir-pedido' => [
             'title' => 'Seguir mi pedido',

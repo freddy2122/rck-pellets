@@ -2,7 +2,6 @@ import { PROVINCES, SITE } from './site';
 import { includedVat, isValidSpanishPostalCode } from './format';
 
 export const ORDER_STORAGE_KEY = 'rck_last_order';
-export const CHECKOUT_DRAFT_KEY = 'rck_checkout_draft';
 
 export const PAYMENT_METHODS = [
     {
@@ -92,18 +91,4 @@ export function readLastOrder() {
     } catch {
         return null;
     }
-}
-
-export function readCheckoutDraft() {
-    try {
-        const raw = localStorage.getItem(CHECKOUT_DRAFT_KEY);
-
-        return raw ? JSON.parse(raw) : null;
-    } catch {
-        return null;
-    }
-}
-
-export function saveCheckoutDraft(form) {
-    localStorage.setItem(CHECKOUT_DRAFT_KEY, JSON.stringify(form));
 }

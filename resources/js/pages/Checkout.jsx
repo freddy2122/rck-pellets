@@ -9,8 +9,6 @@ import {
     PAYMENT_METHODS,
     addressIsComplete,
     makeOrderId,
-    readCheckoutDraft,
-    saveCheckoutDraft,
     saveLastOrder,
     shippingFor,
     totalsFor,
@@ -54,31 +52,18 @@ export default function Checkout() {
     const site = useSite();
     const navigate = useNavigate();
     const [form, setForm] = useState(() => {
-        const draft = typeof window === 'undefined' ? null : readCheckoutDraft();
-
         const merged = {
             ...emptyForm,
-            ...draft,
-            notes: draft?.notes || note || '',
+            notes: note || '',
         };
 
-        if (!PROVINCES.includes(merged.district)) {
-            merged.district = '';
-        }
-
         merged.phoneCountry = findPhoneCountry(merged.phoneCountry).iso;
-
-        // Brouillons enregistres avant le retrait de moyens de paiement.
-        if (['mbway', 'multibanco', 'cajero'].includes(merged.payment)) {
-            merged.payment = 'transferencia';
-        }
 
         return merged;
     });
     const [loading, setLoading] = useState(false);
     const [placed, setPlaced] = useState(false);
     const [error, setError] = useState('');
-    const [saved, setSaved] = useState(false);
     const [bank, setBank] = useState(SITE.bank);
 
     useEffect(() => {
@@ -103,13 +88,7 @@ export default function Checkout() {
             ...current,
             [name]: type === 'checkbox' ? checked : value,
         }));
-        setSaved(false);
         setError('');
-    };
-
-    const handleSaveDraft = () => {
-        saveCheckoutDraft(form);
-        setSaved(true);
     };
 
     const handleSubmit = async (event) => {
@@ -395,7 +374,6 @@ const phone = formatInternationalPhone(form.phone, phoneCountry);
                                     ...current,
                                     phoneCountry: iso,
                                 }));
-                                setSaved(false);
                                 setError('');
                             }}
                         />
@@ -497,19 +475,6 @@ const phone = formatInternationalPhone(form.phone, phoneCountry);
                             Instrucciones del carrito: {form.notes || note}
                         </p>
                     )}
-                </section>
-
-                <section className="mt-8 flex items-center justify-between gap-4 rounded-lg border border-[#e6e6e6] px-4 py-4">
-                    <p className="text-sm">
-                        Guardar mis datos para un pago más rápido
-                    </p>
-                    <button
-                        type="button"
-                        onClick={handleSaveDraft}
-                        className="shrink-0 rounded-md border border-[#d0d0d0] bg-white px-4 py-2 text-sm"
-                    >
-                        {saved ? 'Guardado' : 'Guardar'}
-                    </button>
                 </section>
 
                 {error && (

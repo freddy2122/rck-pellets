@@ -19,7 +19,7 @@ export const SITE = {
         country: 'España',
     },
     shipping: {
-        mainland: '2 a 5 días laborables (Península)',
+        mainland: '2 a 5 días laborables',
         islands: '5 a 10 días laborables (Baleares, Canarias, Ceuta y Melilla)',
         freeFrom: 250,
         mainlandPrice: 1.5,

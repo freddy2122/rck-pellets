@@ -14,7 +14,7 @@ use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
-    private const MAINLAND_SHIPPING = 2.99;
+    private const MAINLAND_SHIPPING = 1.50;
 
     private const ISLANDS_SHIPPING = 24.90;
 
@@ -144,7 +144,7 @@ class OrderController extends Controller
             'code' => 'continente',
             'label' => 'Estándar',
             'price' => self::MAINLAND_SHIPPING,
-            'detail' => '2 a 5 días laborables (Península)',
+            'detail' => '2 a 5 días laborables',
         ];
     }
 

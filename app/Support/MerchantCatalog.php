@@ -15,7 +15,7 @@ class MerchantCatalog
 
     public static function shippingMainlandPrice(): string
     {
-        return '2.99';
+        return '1.50';
     }
 
     public static function shippingIslandsPrice(): string
