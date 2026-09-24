@@ -9,7 +9,7 @@ import {
     estimatedDeliveryDate,
     formatDeliveryDate,
 } from '../lib/delivery';
-import { SITE } from '../lib/site';
+import { SITE, whatsappLink } from '../lib/site';
 
 export default function OrderConfirmation() {
     const { token } = useParams();
@@ -196,6 +196,29 @@ export default function OrderConfirmation() {
                             />
                             <CopyRow label="Importe" value={amount} />
                         </div>
+
+                        <p className="mt-4 border-t border-[#eee] pt-3 text-xs leading-5 text-[#6d6d6d]">
+                            Para agilizar la confirmación, envíanos el
+                            justificante del pago por{' '}
+                            <a
+                                href={whatsappLink(
+                                    `Hola, adjunto el justificante de mi transferencia para el pedido ${order.id}.`,
+                                )}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-medium text-[#1773b8] underline"
+                            >
+                                WhatsApp
+                            </a>{' '}
+                            o por{' '}
+                            <a
+                                href={`mailto:${SITE.email}`}
+                                className="font-medium text-[#1773b8] underline"
+                            >
+                                e-mail
+                            </a>
+                            .
+                        </p>
                     </div>
                 </div>
                 <label className="flex items-center gap-2 border-t border-[#eee] px-5 py-3 text-sm">

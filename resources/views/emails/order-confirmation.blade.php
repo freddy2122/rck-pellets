@@ -11,6 +11,9 @@
         $order->estimatedDelivery()->locale('es')->isoFormat('dddd D [de] MMMM'),
     );
     $trackUrl = $order->storeUrl().'seguir-pedido?n='.urlencode($order->number).'&email='.urlencode($order->email);
+    $contact = \App\Models\SiteContent::contact();
+    $whatsappText = 'Hola, adjunto el justificante de mi transferencia para el pedido '.$order->number.'.';
+    $whatsappUrl = 'https://wa.me/'.\App\Models\SiteContent::phoneDigits($contact['phone']).'?text='.urlencode($whatsappText);
 @endphp
 <!DOCTYPE html>
 <html lang="es">
@@ -93,6 +96,12 @@
                                 @if (!empty($bank['tipoTransferencia']))
                                     · Tipo de transferencia: {{ $bank['tipoTransferencia'] }}
                                 @endif
+                            </div>
+                            <div style="font-size:12px;color:#6d6d6d;margin-top:10px;">
+                                Para agilizar la confirmación, envíanos el justificante del pago por
+                                <a href="{{ $whatsappUrl }}" style="color:#1773b8;">WhatsApp</a>
+                                o por
+                                <a href="mailto:{{ $contact['email'] }}" style="color:#1773b8;">e-mail</a>.
                             </div>
                         </td>
                     </tr>
