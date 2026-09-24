@@ -10,11 +10,6 @@ export const PAYMENT_METHODS = [
         label: 'Transferencia bancaria',
         hint: 'Usa el número de pedido como concepto para identificar el pago.',
     },
-    {
-        id: 'cajero',
-        label: 'Ingreso en cajero automático',
-        hint: 'Ingresa el importe en un cajero automático o en la ventanilla de tu banco, indicando el número de pedido como concepto.',
-    },
 ];
 
 export function paymentLabel(id) {

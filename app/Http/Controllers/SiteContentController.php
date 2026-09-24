@@ -203,19 +203,11 @@ class SiteContentController extends Controller
     public function updateBank(Request $request)
     {
         $validated = $request->validate([
-            'holder' => ['required', 'string', 'max:180'],
-            'name' => ['nullable', 'string', 'max:180'],
-            'iban' => ['required', 'string', 'max:42'],
-            'bic' => ['required', 'string', 'max:16'],
-            'tipoTransferencia' => ['nullable', 'string', 'max:60'],
+            'instructions' => ['required', 'string', 'max:2000'],
         ]);
 
         $payload = [
-            'holder' => trim($validated['holder']),
-            'name' => trim((string) ($validated['name'] ?? '')),
-            'iban' => strtoupper(preg_replace('/\s+/', '', $validated['iban'])),
-            'bic' => strtoupper(trim($validated['bic'])),
-            'tipoTransferencia' => trim((string) ($validated['tipoTransferencia'] ?? '')),
+            'instructions' => trim($validated['instructions']),
         ];
 
         SiteContent::query()->updateOrCreate(

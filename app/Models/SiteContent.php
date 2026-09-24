@@ -18,14 +18,13 @@ class SiteContent extends Model
     public static function defaultBank(): array
     {
         return [
-            'holder' => 'Jardines Gerardo',
-            'name' => '',
-            'iban' => env('BANK_IBAN', ''),
-            'bic' => env('BANK_BIC', ''),
-            'tipoTransferencia' => 'Inmediata',
+            'instructions' => "VERONICA PEREZAGUA GONZALEZ (imaginBank)\n\nIBAN: ES15 2100 6095 5002 0031 4230\nBIC: CAIXESBBXXX\nTipo de transferencia: Inmediata",
         ];
     }
 
+    /**
+     * @return array{instructions: string}
+     */
     public static function bank(): array
     {
         $defaults = self::defaultBank();
@@ -36,13 +35,40 @@ class SiteContent extends Model
             return $defaults;
         }
 
-        return [
-            'holder' => trim((string) ($stored['holder'] ?? $defaults['holder'])) ?: $defaults['holder'],
-            'name' => trim((string) ($stored['name'] ?? '')),
-            'iban' => trim((string) ($stored['iban'] ?? $defaults['iban'])) ?: $defaults['iban'],
-            'bic' => trim((string) ($stored['bic'] ?? $defaults['bic'])) ?: $defaults['bic'],
-            'tipoTransferencia' => trim((string) ($stored['tipoTransferencia'] ?? $defaults['tipoTransferencia'])) ?: $defaults['tipoTransferencia'],
-        ];
+        if (! empty($stored['instructions'])) {
+            return ['instructions' => trim((string) $stored['instructions'])];
+        }
+
+        // Compatibilite : anciennes donnees enregistrees en champs separes
+        // (holder/name/iban/bic/tipoTransferencia), avant le passage a un
+        // seul champ de texte libre.
+        if (! empty($stored['iban'])) {
+            $lines = [];
+            $holderLine = trim((string) ($stored['holder'] ?? ''));
+
+            if (! empty($stored['name'])) {
+                $holderLine .= ' ('.$stored['name'].')';
+            }
+
+            if ($holderLine !== '') {
+                $lines[] = $holderLine;
+                $lines[] = '';
+            }
+
+            $lines[] = 'IBAN: '.$stored['iban'];
+
+            if (! empty($stored['bic'])) {
+                $lines[] = 'BIC: '.$stored['bic'];
+            }
+
+            if (! empty($stored['tipoTransferencia'])) {
+                $lines[] = 'Tipo de transferencia: '.$stored['tipoTransferencia'];
+            }
+
+            return ['instructions' => implode("\n", $lines)];
+        }
+
+        return $defaults;
     }
 
     public static function defaultContact(): array

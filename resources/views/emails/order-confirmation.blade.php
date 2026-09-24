@@ -1,8 +1,5 @@
 @php
     $bank = \App\Models\SiteContent::bank();
-    $iban = $bank['iban'];
-    $bic = $bank['bic'];
-    $holder = $bank['holder'];
     $payBy = $order->pay_by
         ? $order->pay_by->copy()->locale('es')->isoFormat('D [de] MMMM [de] YYYY')
         : null;
@@ -72,31 +69,19 @@
 
                     <tr>
                         <td style="padding-bottom:28px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <div style="font-size:14px;line-height:1.6;white-space:pre-line;border:1px solid #e6e6e6;border-radius:6px;padding:12px;">{{ $bank['instructions'] }}</div>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">
                                 <tr>
-                                    <td width="33%" valign="top" style="padding-right:8px;">
-                                        <div style="font-size:12px;color:#6d6d6d;margin-bottom:4px;">IBAN</div>
-                                        <div style="font-size:14px;font-weight:600;letter-spacing:0.02em;">{{ $iban }}</div>
+                                    <td width="50%" valign="top">
+                                        <div style="font-size:12px;color:#6d6d6d;margin-bottom:4px;">Concepto</div>
+                                        <div style="font-size:14px;font-weight:600;">{{ $order->number }}</div>
                                     </td>
-                                    <td width="33%" valign="top" style="padding-right:8px;">
-                                        <div style="font-size:12px;color:#6d6d6d;margin-bottom:4px;">BIC / SWIFT</div>
-                                        <div style="font-size:14px;font-weight:600;">{{ $bic }}</div>
-                                    </td>
-                                    <td width="33%" valign="top">
+                                    <td width="50%" valign="top">
                                         <div style="font-size:12px;color:#6d6d6d;margin-bottom:4px;">Importe</div>
                                         <div style="font-size:14px;font-weight:600;">{{ \App\Models\Order::formatEuro($order->total) }}</div>
                                     </td>
                                 </tr>
                             </table>
-                            <div style="font-size:12px;color:#6d6d6d;margin-top:10px;">
-                                Titular: {{ $holder }}
-                                @if (!empty($bank['name']))
-                                    · Banco: {{ $bank['name'] }}
-                                @endif
-                                @if (!empty($bank['tipoTransferencia']))
-                                    · Tipo de transferencia: {{ $bank['tipoTransferencia'] }}
-                                @endif
-                            </div>
                             <div style="font-size:12px;color:#6d6d6d;margin-top:10px;">
                                 Para agilizar la confirmación, envíanos el justificante del pago por
                                 <a href="{{ $whatsappUrl }}" style="color:#1773b8;">WhatsApp</a>

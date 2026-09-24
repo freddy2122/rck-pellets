@@ -26,11 +26,7 @@ export const SITE = {
         islandsPrice: 24.9,
     },
     bank: {
-        holder: 'Jardines Gerardo',
-        name: '',
-        iban: '',
-        bic: '',
-        tipoTransferencia: '',
+        instructions: '',
     },
 };
 

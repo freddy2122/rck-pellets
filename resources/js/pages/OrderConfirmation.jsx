@@ -4,7 +4,7 @@ import { Check, Copy } from 'lucide-react';
 import CheckoutShell from '../components/CheckoutShell';
 import OrderSummary from '../components/OrderSummary';
 import { paymentLabel, readLastOrder } from '../lib/checkout';
-import { formatCheckoutMoney, formatIban } from '../lib/format';
+import { formatCheckoutMoney } from '../lib/format';
 import {
     estimatedDeliveryDate,
     formatDeliveryDate,
@@ -164,32 +164,11 @@ export default function OrderConfirmation() {
                                 ? 'Ingresa el importe en un cajero automático o en la ventanilla de tu banco. Usa el número de pedido como concepto.'
                                 : 'Usa el número de pedido como concepto para identificar el pago.'}
                         </p>
+                        <div className="whitespace-pre-line rounded-lg border border-[#ececec] px-3 py-3 text-sm font-medium text-[#1a1a1a]">
+                            {bank.instructions}
+                        </div>
+
                         <div className="mt-3 grid gap-3">
-                            <CopyRow
-                                label="Titular"
-                                value={bank.holder}
-                            />
-                            {bank.name ? (
-                                <CopyRow
-                                    label="Banco"
-                                    value={bank.name}
-                                />
-                            ) : null}
-                            <CopyRow
-                                label="IBAN"
-                                value={formatIban(bank.iban)}
-                                copyValue={bank.iban}
-                            />
-                            <CopyRow
-                                label="BIC / SWIFT"
-                                value={bank.bic}
-                            />
-                            {bank.tipoTransferencia ? (
-                                <CopyRow
-                                    label="Tipo de transferencia"
-                                    value={bank.tipoTransferencia}
-                                />
-                            ) : null}
                             <CopyRow
                                 label="Concepto"
                                 value={order.id}
@@ -246,11 +225,6 @@ export default function OrderConfirmation() {
                         <span className="inline-flex items-center gap-2">
                             {paymentLabel(order.payment)} · {amount} EUR
                         </span>
-                        <p className="mt-2">
-                            IBAN {formatIban(bank.iban)}
-                            <br />
-                            BIC {bank.bic}
-                        </p>
                     </Detail>
                     <Detail title="Dirección de envío">
                         <AddressBlock order={order} />

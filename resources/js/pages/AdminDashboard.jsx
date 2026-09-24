@@ -137,13 +137,7 @@ export default function AdminDashboard() {
     const [qualityImageFile, setQualityImageFile] = useState(null);
     const [qualityImagePreview, setQualityImagePreview] = useState('');
     const [qualityImageLoading, setQualityImageLoading] = useState(false);
-    const [bankForm, setBankForm] = useState({
-        holder: 'LEÑAS CASTOR S.L.',
-        name: '',
-        iban: '',
-        bic: '',
-        tipoTransferencia: '',
-    });
+    const [bankForm, setBankForm] = useState({ instructions: '' });
     const [savingBank, setSavingBank] = useState(false);
     const [contactForm, setContactForm] = useState({
         email: '',
@@ -295,13 +289,7 @@ export default function AdminDashboard() {
 
             if (bankResponse.ok) {
                 const bankData = await bankResponse.json();
-                setBankForm({
-                    holder: bankData.holder || 'LEÑAS CASTOR S.L.',
-                    name: bankData.name || '',
-                    iban: bankData.iban || '',
-                    bic: bankData.bic || '',
-                    tipoTransferencia: bankData.tipoTransferencia || '',
-                });
+                setBankForm({ instructions: bankData.instructions || '' });
             }
 
             const contactResponse = await fetch('/api/site-content/contact');
@@ -1270,13 +1258,7 @@ export default function AdminDashboard() {
                 );
             }
 
-            setBankForm({
-                holder: data.holder || bankForm.holder,
-                name: data.name || '',
-                iban: data.iban || '',
-                bic: data.bic || '',
-                tipoTransferencia: data.tipoTransferencia || '',
-            });
+            setBankForm({ instructions: data.instructions || '' });
         } catch (err) {
             setError(err.message);
         } finally {
@@ -2353,105 +2335,43 @@ export default function AdminDashboard() {
                                 Coordonnées bancaires
                             </h3>
                             <p className="text-sm text-gray-500">
-                                Affichées sur la confirmation de commande et
-                                dans l’e-mail (IBAN / BIC).
+                                Affichées sur le checkout, la confirmation de
+                                commande et dans l’e-mail. Le numéro de
+                                commande et le montant s’ajoutent
+                                automatiquement en dessous, inutile de les
+                                inclure ici.
                             </p>
                         </div>
                     </div>
-                    <form
-                        onSubmit={saveBankDetails}
-                        className="grid gap-4 p-6 md:grid-cols-2"
-                    >
+                    <form onSubmit={saveBankDetails} className="p-6">
                         <label className="block text-sm">
                             <span className="mb-1 block font-medium text-gray-700">
-                                Titulaire
+                                Instructions de paiement
                             </span>
-                            <input
-                                value={bankForm.holder}
+                            <textarea
+                                value={bankForm.instructions}
                                 onChange={(event) =>
-                                    setBankForm((current) => ({
-                                        ...current,
-                                        holder: event.target.value,
-                                    }))
+                                    setBankForm({
+                                        instructions: event.target.value,
+                                    })
                                 }
                                 required
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-green-700"
-                            />
-                        </label>
-                        <label className="block text-sm">
-                            <span className="mb-1 block font-medium text-gray-700">
-                                Banque (optionnel)
-                            </span>
-                            <input
-                                value={bankForm.name}
-                                onChange={(event) =>
-                                    setBankForm((current) => ({
-                                        ...current,
-                                        name: event.target.value,
-                                    }))
+                                rows={10}
+                                placeholder={
+                                    'VERONICA PEREZAGUA GONZALEZ (imaginBank)\n\nIBAN: ES15 2100 6095 5002 0031 4230\nBIC: CAIXESBBXXX\nTipo de transferencia: Inmediata'
                                 }
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-green-700"
+                                className="w-full rounded-xl border border-gray-300 px-4 py-3 font-mono text-sm outline-none focus:border-green-700"
                             />
                         </label>
-                        <label className="block text-sm">
-                            <span className="mb-1 block font-medium text-gray-700">
-                                IBAN
-                            </span>
-                            <input
-                                value={bankForm.iban}
-                                onChange={(event) =>
-                                    setBankForm((current) => ({
-                                        ...current,
-                                        iban: event.target.value,
-                                    }))
-                                }
-                                required
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 font-mono outline-none focus:border-green-700"
-                            />
-                        </label>
-                        <label className="block text-sm">
-                            <span className="mb-1 block font-medium text-gray-700">
-                                BIC / SWIFT
-                            </span>
-                            <input
-                                value={bankForm.bic}
-                                onChange={(event) =>
-                                    setBankForm((current) => ({
-                                        ...current,
-                                        bic: event.target.value,
-                                    }))
-                                }
-                                required
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 font-mono outline-none focus:border-green-700"
-                            />
-                        </label>
-                        <label className="block text-sm">
-                            <span className="mb-1 block font-medium text-gray-700">
-                                Tipo de transferencia
-                            </span>
-                            <input
-                                value={bankForm.tipoTransferencia}
-                                onChange={(event) =>
-                                    setBankForm((current) => ({
-                                        ...current,
-                                        tipoTransferencia: event.target.value,
-                                    }))
-                                }
-                                placeholder="Ej. Transferencia SEPA"
-                                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-green-700"
-                            />
-                        </label>
-                        <div className="md:col-span-2">
-                            <button
-                                type="submit"
-                                disabled={savingBank}
-                                className="rounded-xl bg-green-800 px-5 py-3 text-sm font-semibold text-white hover:bg-green-900 disabled:opacity-60"
-                            >
-                                {savingBank
-                                    ? 'Enregistrement…'
-                                    : 'Enregistrer l’IBAN'}
-                            </button>
-                        </div>
+                        <button
+                            type="submit"
+                            disabled={savingBank}
+                            className="mt-4 rounded-xl bg-green-800 px-5 py-3 text-sm font-semibold text-white hover:bg-green-900 disabled:opacity-60"
+                        >
+                            {savingBank
+                                ? 'Enregistrement…'
+                                : 'Enregistrer'}
+                        </button>
                     </form>
                 </section>
                 </>

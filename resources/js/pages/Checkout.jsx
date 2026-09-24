@@ -19,10 +19,8 @@ import { PROVINCES, SITE } from '../lib/site';
 import { findPhoneCountry } from '../lib/phoneCountries';
 import {
     formatCheckoutMoney,
-    formatIban,
     formatInternationalPhone,
     includedVat,
-    isValidNif,
     isValidPhoneForCountry,
 } from '../lib/format';
 import { useSite } from '../lib/SiteContext';
@@ -46,7 +44,6 @@ const emptyForm = {
     phone: '',
     phoneCountry: 'ES',
     nif: '',
-    showNif: false,
     payment: 'transferencia',
     billingSame: true,
     notes: '',
@@ -71,8 +68,8 @@ export default function Checkout() {
 
         merged.phoneCountry = findPhoneCountry(merged.phoneCountry).iso;
 
-        // Brouillons enregistres avant le retrait des moyens portugais.
-        if (['mbway', 'multibanco'].includes(merged.payment)) {
+        // Brouillons enregistres avant le retrait de moyens de paiement.
+        if (['mbway', 'multibanco', 'cajero'].includes(merged.payment)) {
             merged.payment = 'transferencia';
         }
 
@@ -143,12 +140,7 @@ export default function Checkout() {
             return;
         }
 
-        if (form.showNif && form.nif && !isValidNif(form.nif)) {
-            setError('El NIF/NIE indicado no es válido.');
-            return;
-        }
-
-        const phone = formatInternationalPhone(form.phone, phoneCountry);
+const phone = formatInternationalPhone(form.phone, phoneCountry);
         const payload = {
             email: form.email,
             firstName: form.firstName.trim(),
@@ -409,29 +401,6 @@ export default function Checkout() {
                         />
                     </div>
 
-                    {form.showNif ? (
-                        <div className="mt-3">
-                            <FloatingField
-                                name="nif"
-                                label="NIF/NIE"
-                                value={form.nif}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    ) : (
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setForm((current) => ({
-                                    ...current,
-                                    showNif: true,
-                                }))
-                            }
-                            className="mt-3 text-sm text-[#1773b8] hover:underline"
-                        >
-                            + Añadir número de identificación fiscal
-                        </button>
-                    )}
                 </section>
 
                 <section className="mt-8">
@@ -500,54 +469,8 @@ export default function Checkout() {
                                         <div className="border-t border-[#d0d0d0] bg-[#f5f5f5] px-4 py-4 text-sm leading-6 text-[#4d4d4d]">
                                             {method.hint}
 
-                                            <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg bg-white px-3 py-3 text-[#1a1a1a]">
-                                                <div>
-                                                    <p className="text-[11px] uppercase tracking-wide text-[#6d6d6d]">
-                                                        Titular
-                                                    </p>
-                                                    <p className="font-medium">
-                                                        {bank.holder}
-                                                    </p>
-                                                </div>
-                                                {bank.name ? (
-                                                    <div>
-                                                        <p className="text-[11px] uppercase tracking-wide text-[#6d6d6d]">
-                                                            Banco
-                                                        </p>
-                                                        <p className="font-medium">
-                                                            {bank.name}
-                                                        </p>
-                                                    </div>
-                                                ) : null}
-                                                <div>
-                                                    <p className="text-[11px] uppercase tracking-wide text-[#6d6d6d]">
-                                                        IBAN
-                                                    </p>
-                                                    <p className="font-medium">
-                                                        {formatIban(bank.iban)}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-[11px] uppercase tracking-wide text-[#6d6d6d]">
-                                                        BIC / SWIFT
-                                                    </p>
-                                                    <p className="font-medium">
-                                                        {bank.bic}
-                                                    </p>
-                                                </div>
-                                                {bank.tipoTransferencia ? (
-                                                    <div>
-                                                        <p className="text-[11px] uppercase tracking-wide text-[#6d6d6d]">
-                                                            Tipo de
-                                                            transferencia
-                                                        </p>
-                                                        <p className="font-medium">
-                                                            {
-                                                                bank.tipoTransferencia
-                                                            }
-                                                        </p>
-                                                    </div>
-                                                ) : null}
+                                            <div className="mt-3 whitespace-pre-line rounded-lg bg-white px-3 py-3 font-medium text-[#1a1a1a]">
+                                                {bank.instructions}
                                             </div>
 
                                             <label className="mt-3 flex items-center gap-2 text-sm text-[#1a1a1a]">
