@@ -298,4 +298,11 @@ class OrderController extends Controller
 
         return response()->json($order->toAdminArray());
     }
+
+    public function destroy(Order $order)
+    {
+        $order->delete();
+
+        return response()->json(['message' => 'Pedido eliminado.']);
+    }
 }

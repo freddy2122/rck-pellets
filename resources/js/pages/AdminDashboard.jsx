@@ -975,6 +975,31 @@ export default function AdminDashboard() {
         }
     };
 
+    const deleteOrder = async (orderId) => {
+        if (!window.confirm('¿Eliminar definitivamente este pedido?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/admin/orders/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                setOrders((current) =>
+                    current.filter((order) => order.id !== orderId),
+                );
+                setOrdersTotal((current) => Math.max(0, current - 1));
+            }
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
     /**
      * Recharge la liste des commandes en tenant compte de la recherche
      * et du filtre de statut.
@@ -2734,15 +2759,27 @@ export default function AdminDashboard() {
                                                 )}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        openOrderDetail(order.id)
-                                                    }
-                                                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                                                >
-                                                    Voir
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            openOrderDetail(order.id)
+                                                        }
+                                                        className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                                    >
+                                                        Voir
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            deleteOrder(order.id)
+                                                        }
+                                                        title="Supprimer ce pedido"
+                                                        className="rounded-lg p-2 text-gray-400 hover:bg-rose-50 hover:text-rose-600"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}

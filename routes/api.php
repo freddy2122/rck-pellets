@@ -129,6 +129,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/orders/export', [OrderController::class, 'export']);
     Route::get('/admin/orders/{order}', [OrderController::class, 'showAdmin']);
     Route::patch('/admin/orders/{order}', [OrderController::class, 'updateStatus']);
+    Route::delete('/admin/orders/{order}', [OrderController::class, 'destroy']);
     Route::get('/admin/articles', [ArticleController::class, 'adminIndex']);
     Route::post('/admin/articles', [ArticleController::class, 'store']);
     Route::put('/admin/articles/{article}', [ArticleController::class, 'update']);
